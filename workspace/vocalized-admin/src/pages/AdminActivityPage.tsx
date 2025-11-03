@@ -1,12 +1,15 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAdminActions, adminActions } from "../data/adminData";
 import { formatDateTime } from "../lib/utils";
+import { Pagination } from "../components/Pagination";
 
 export function AdminActivityPage() {
   const { data = adminActions } = useQuery({ queryKey: ["admin-actions"], queryFn: fetchAdminActions });
   const [adminFilter, setAdminFilter] = useState("all");
   const [actionFilter, setActionFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
 
   const admins = useMemo(() => Array.from(new Set(data.map((entry) => entry.admin))), [data]);
   const actions = useMemo(() => Array.from(new Set(data.map((entry) => entry.action))), [data]);
@@ -18,6 +21,15 @@ export function AdminActivityPage() {
       return matchesAdmin && matchesAction;
     });
   }, [data, adminFilter, actionFilter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [adminFilter, actionFilter, data]);
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
 
   return (
     <div className="space-y-6">
@@ -65,7 +77,7 @@ export function AdminActivityPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-900">
-            {filtered.map((entry) => (
+            {paginated.map((entry) => (
               <tr key={entry.id} className="hover:bg-slate-900/50">
                 <td className="px-5 py-3 text-white">{entry.admin}</td>
                 <td className="px-5 py-3">{entry.action}</td>
@@ -77,6 +89,8 @@ export function AdminActivityPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} pageSize={pageSize} total={filtered.length} onPageChange={setPage} />
     </div>
   );
 }
