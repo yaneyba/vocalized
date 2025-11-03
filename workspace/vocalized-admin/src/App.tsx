@@ -11,14 +11,16 @@ import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { SystemPage } from "./pages/SystemPage";
 import { LogsPage } from "./pages/LogsPage";
 import { AdminActivityPage } from "./pages/AdminActivityPage";
+import { useAuth } from "./providers/AuthContext";
+import { useMemo } from "react";
 
 const defaultRedirect = <Navigate to="/overview" replace />;
 
 function App() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route element={<AdminLayout />}>
+      <Route path="/login" element={<LoginRoute />} />
+      <Route element={<ProtectedLayout />}>
         <Route index element={defaultRedirect} />
         <Route path="overview" element={<PlatformOverviewPage />} />
         <Route path="workspaces" element={<WorkspacesPage />} />
@@ -37,3 +39,29 @@ function App() {
 }
 
 export default App;
+
+function ProtectedLayout() {
+  const { user, loading } = useAuth();
+  const content = useMemo(() => {
+    if (loading) {
+      return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">Checking access…</div>;
+    }
+    if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+    return <AdminLayout />;
+  }, [loading, user]);
+
+  return content;
+}
+
+function LoginRoute() {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">Loading…</div>;
+  }
+  if (user) {
+    return <Navigate to="/overview" replace />;
+  }
+  return <LoginPage />;
+}

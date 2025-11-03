@@ -1,16 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, LogIn, Mail } from "lucide-react";
+import { useAuth } from "../providers/AuthContext";
 
 export function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [twoFactor, setTwoFactor] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const { signIn, loading } = useAuth();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    navigate("/overview");
+    try {
+      setError(null);
+      await signIn({ email, password, code: twoFactor });
+      navigate("/overview", { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to sign in");
+    }
   };
 
   return (
@@ -64,9 +73,15 @@ export function LoginPage() {
             />
           </label>
 
-          <button type="submit" className="admin-btn-primary w-full justify-center">
+          {error ? <p className="text-xs text-red-300">{error}</p> : null}
+
+          <button
+            type="submit"
+            className="admin-btn-primary w-full justify-center"
+            disabled={loading}
+          >
             <LogIn className="h-4 w-4" />
-            Enter console
+            {loading ? "Signing in…" : "Enter console"}
           </button>
         </form>
       </div>

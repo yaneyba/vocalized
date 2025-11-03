@@ -10,7 +10,6 @@ import {
   Gauge,
   KeyRound,
   LayoutDashboard,
-  ListTree,
   LogOut,
   Logs,
   Plug,
@@ -22,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { CommandPalette, type CommandPaletteItem } from "./CommandPalette";
+import { useAuth } from "../providers/AuthContext";
 
 const navigation = [
   { label: "Overview", to: "/overview", icon: LayoutDashboard },
@@ -59,6 +59,7 @@ export function AdminLayout() {
   const navigate = useNavigate();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const { signOut, user } = useAuth();
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -161,11 +162,20 @@ export function AdminLayout() {
           <button
             type="button"
             className="admin-btn-ghost w-full justify-center border border-transparent hover:border-slate-700"
-            onClick={() => navigate("/login")}
+            onClick={async () => {
+              await signOut();
+              navigate("/login", { replace: true });
+            }}
           >
             <KeyRound className="h-4 w-4" /> Switch account
           </button>
-          <button className="admin-btn-ghost w-full justify-center border border-transparent hover:border-red-500/40">
+          <button
+            className="admin-btn-ghost w-full justify-center border border-transparent hover:border-red-500/40"
+            onClick={async () => {
+              await signOut();
+              navigate("/login", { replace: true });
+            }}
+          >
             <LogOut className="h-4 w-4" /> Sign out
           </button>
         </div>
@@ -199,8 +209,8 @@ export function AdminLayout() {
               </span>
             </button>
             <div className="text-right">
-              <p className="text-sm font-semibold text-white">Morgan Carter</p>
-              <p className="text-xs text-slate-500">Super Admin</p>
+              <p className="text-sm font-semibold text-white">{user?.name ?? "Admin"}</p>
+              <p className="text-xs text-slate-500">{user?.role ?? "Admin"}</p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-accent/80 text-white">
               <Users className="h-5 w-5" />
