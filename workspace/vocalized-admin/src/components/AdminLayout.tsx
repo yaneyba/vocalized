@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity,
@@ -59,7 +59,15 @@ export function AdminLayout() {
   const navigate = useNavigate();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { signOut, user } = useAuth();
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const handleSignOut = async () => {
+    setUserMenuOpen(false);
+    await signOut();
+    navigate("/login", { replace: true });
+  };
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -95,6 +103,21 @@ export function AdminLayout() {
     });
     return mapped.length ? mapped : [{ label: "Overview", href: "/overview" }];
   }, [location.pathname]);
+
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handleClick = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    window.addEventListener("mousedown", handleClick);
+    return () => window.removeEventListener("mousedown", handleClick);
+  }, [userMenuOpen]);
 
   const impersonateWorkspace = () => {
     // Placeholder for real impersonation flow
@@ -162,19 +185,13 @@ export function AdminLayout() {
           <button
             type="button"
             className="admin-btn-ghost w-full justify-center border border-transparent hover:border-slate-700"
-            onClick={async () => {
-              await signOut();
-              navigate("/login", { replace: true });
-            }}
+            onClick={handleSignOut}
           >
             <KeyRound className="h-4 w-4" /> Switch account
           </button>
           <button
             className="admin-btn-ghost w-full justify-center border border-transparent hover:border-red-500/40"
-            onClick={async () => {
-              await signOut();
-              navigate("/login", { replace: true });
-            }}
+            onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4" /> Sign out
           </button>
@@ -208,12 +225,44 @@ export function AdminLayout() {
                 {notifications.length}
               </span>
             </button>
-            <div className="text-right">
+            <div className="hidden text-right sm:block">
               <p className="text-sm font-semibold text-white">{user?.name ?? "Admin"}</p>
-              <p className="text-xs text-slate-500">{user?.role ?? "Admin"}</p>
+              <p className="text-xs text-slate-500">{user?.role ?? "Administrator"}</p>
             </div>
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-accent/80 text-white">
-              <Users className="h-5 w-5" />
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((open) => !open)}
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-accent/80 text-white transition hover:bg-primary-accent"
+                aria-haspopup="menu"
+                aria-expanded={userMenuOpen}
+              >
+                <Users className="h-5 w-5" />
+              </button>
+              {userMenuOpen ? (
+                <div className="absolute right-0 mt-3 w-56 overflow-hidden rounded-xl border border-slate-800 bg-slate-900/90 text-sm shadow-xl backdrop-blur">
+                  <div className="border-b border-slate-800 px-4 py-3 text-slate-300">
+                    <p className="font-semibold text-white">{user?.name ?? "Admin user"}</p>
+                    <p className="text-xs text-slate-500">{user?.email ?? "admin@vocalized.app"}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-slate-300 transition hover:bg-slate-800/70"
+                    onClick={handleSignOut}
+                  >
+                    <KeyRound className="h-4 w-4" />
+                    Switch account
+                  </button>
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-rose-300 transition hover:bg-rose-500/10"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         </header>
