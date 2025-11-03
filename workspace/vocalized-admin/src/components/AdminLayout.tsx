@@ -1,36 +1,133 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity,
-  BadgeCheck,
+  BarChart3,
+  Bell,
+  Building2,
+  CloudCog,
+  Cpu,
   Gauge,
+  KeyRound,
+  LayoutDashboard,
+  ListTree,
   LogOut,
-  Settings,
+  Logs,
+  Plug,
+  Receipt,
+  Search,
   ShieldHalf,
   Users,
+  Workflow,
 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { CommandPalette, type CommandPaletteItem } from "./CommandPalette";
 
 const navigation = [
-  { label: "Dashboard", to: "/", icon: Gauge },
-  { label: "Audit", to: "/audit", icon: Activity },
-  { label: "Settings", to: "/settings", icon: Settings },
+  { label: "Overview", to: "/overview", icon: LayoutDashboard },
+  { label: "Workspaces", to: "/workspaces", icon: Building2 },
+  { label: "Users", to: "/users", icon: Users },
+  { label: "Providers", to: "/providers", icon: CloudCog },
+  { label: "Integrations", to: "/integrations", icon: Plug },
+  { label: "Billing", to: "/billing", icon: Receipt },
+  { label: "Analytics", to: "/analytics", icon: BarChart3 },
+  { label: "System", to: "/system", icon: Cpu },
+  { label: "Logs", to: "/logs", icon: Logs },
+  { label: "Admin Activity", to: "/activity", icon: Activity },
+];
+
+const notifications = [
+  {
+    id: "notif-1",
+    message: "Failover activated for Vapi",
+    timestamp: "2m ago",
+  },
+  {
+    id: "notif-2",
+    message: "New workspace onboarded: Quantum CX",
+    timestamp: "12m ago",
+  },
+  {
+    id: "notif-3",
+    message: "Billing webhook latency spike",
+    timestamp: "22m ago",
+  },
 ];
 
 export function AdminLayout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", listener);
+    return () => window.removeEventListener("keydown", listener);
+  }, []);
+
+  const paletteItems: CommandPaletteItem[] = useMemo(
+    () =>
+      navigation.map((item) => ({
+        label: item.label,
+        href: item.to,
+        shortcut: item.label.slice(0, 1).toUpperCase(),
+        description: `Go to ${item.label}`,
+      })),
+    [],
+  );
+
+  const breadcrumbs = useMemo(() => {
+    const segments = location.pathname.split("/").filter(Boolean);
+    const mapped = segments.map((segment, index) => {
+      const href = `/${segments.slice(0, index + 1).join("/")}`;
+      const navMatch = navigation.find((item) => item.to === href);
+      return {
+        label: navMatch?.label ?? segment,
+        href,
+      };
+    });
+    return mapped.length ? mapped : [{ label: "Overview", href: "/overview" }];
+  }, [location.pathname]);
+
+  const impersonateWorkspace = () => {
+    // Placeholder for real impersonation flow
+    alert("Impersonation mode activated for 'Prime Voice Labs'");
+  };
+
   return (
-    <div className="admin-shell">
-      <aside className="flex h-screen flex-col gap-6 border-r border-slate-800/60 bg-slate-950 px-6 py-8">
-        <div className="flex items-center gap-3">
+    <div className="grid min-h-screen grid-cols-[280px_1fr] bg-slate-950 text-slate-100">
+      <aside className="flex h-screen flex-col border-r border-slate-900/70 bg-slate-950 px-6 py-8">
+        <div className="mb-8 flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-light text-slate-100">
             <ShieldHalf className="h-6 w-6" />
           </div>
           <div>
             <p className="text-lg font-semibold">Vocalized</p>
-            <p className="text-xs uppercase tracking-wide text-slate-400">Admin Console</p>
+            <p className="text-xs uppercase tracking-wide text-slate-500">Platform Admin</p>
           </div>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1 text-sm font-medium">
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            className="flex w-full items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
+          >
+            <Search className="h-4 w-4" />
+            <span>Quick command</span>
+            <span className="ml-auto rounded border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+              ⌘K
+            </span>
+          </button>
+        </div>
+
+        <nav className="flex-1 space-y-1 text-sm font-medium">
           {navigation.map((item) => {
             const Icon = item.icon;
             return (
@@ -41,11 +138,10 @@ export function AdminLayout() {
                   cn(
                     "flex items-center gap-3 rounded-xl px-3 py-2 transition",
                     isActive
-                      ? "bg-primary-light text-white shadow-lg"
+                      ? "bg-primary-light/80 text-white shadow-lg"
                       : "text-slate-400 hover:bg-slate-900 hover:text-slate-100",
                   )
                 }
-                end={item.to === "/"}
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
@@ -54,47 +150,90 @@ export function AdminLayout() {
           })}
         </nav>
 
-        <div className="rounded-2xl border border-slate-800/70 bg-slate-900/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Access Controls
-          </p>
-          <p className="mt-2 text-sm text-slate-400">
-            Manage seats, enforce policies, and monitor high-risk actions in real time.
-          </p>
-          <button className="admin-btn-primary mt-4 w-full justify-center">
-            <BadgeCheck className="h-4 w-4" />
-            Manage roles
+        <div className="space-y-3 pt-6">
+          <button
+            type="button"
+            onClick={impersonateWorkspace}
+            className="admin-btn-primary w-full justify-center border border-blue-500/40 bg-primary-accent/80"
+          >
+            <Workflow className="h-4 w-4" /> View as workspace
+          </button>
+          <button
+            type="button"
+            className="admin-btn-ghost w-full justify-center border border-transparent hover:border-slate-700"
+            onClick={() => navigate("/login")}
+          >
+            <KeyRound className="h-4 w-4" /> Switch account
+          </button>
+          <button className="admin-btn-ghost w-full justify-center border border-transparent hover:border-red-500/40">
+            <LogOut className="h-4 w-4" /> Sign out
           </button>
         </div>
-
-        <button className="admin-btn-ghost mt-auto w-full justify-center border border-transparent hover:border-slate-700">
-          <LogOut className="h-4 w-4" />
-          Sign out
-        </button>
       </aside>
 
       <div className="flex max-h-screen flex-col">
-        <header className="border-b border-slate-800/70 bg-slate-950/70 px-8 py-5 backdrop-blur">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-wide text-slate-500">Workspace</p>
-              <h1 className="mt-1 text-2xl font-semibold text-white">Vocalized HQ — Admin</h1>
+        <header className="flex items-center justify-between border-b border-slate-900/70 bg-slate-950/80 px-10 py-6 backdrop-blur">
+          <div>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500">
+              {breadcrumbs.map((crumb, index) => (
+                <span key={crumb.href} className="flex items-center gap-2">
+                  {index > 0 ? <span className="text-slate-700">/</span> : null}
+                  <span>{crumb.label}</span>
+                </span>
+              ))}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-semibold text-white">Morgan Carter</p>
-                <p className="text-xs text-slate-500">Super Admin</p>
-              </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-accent text-white">
-                <Users className="h-5 w-5" />
-              </div>
+            <h1 className="mt-2 text-2xl font-semibold text-white">{breadcrumbs.at(-1)?.label}</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              className={cn(
+                "relative rounded-xl border border-slate-800 bg-slate-900/70 p-2 text-slate-400 transition",
+                notificationOpen ? "text-white" : "hover:text-white",
+              )}
+              onClick={() => setNotificationOpen((open) => !open)}
+            >
+              <Bell className="h-5 w-5" />
+              <span className="absolute -right-2 -top-1 rounded-full bg-blue-500 px-1.5 text-[10px] font-semibold text-white">
+                {notifications.length}
+              </span>
+            </button>
+            <div className="text-right">
+              <p className="text-sm font-semibold text-white">Morgan Carter</p>
+              <p className="text-xs text-slate-500">Super Admin</p>
+            </div>
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-accent/80 text-white">
+              <Users className="h-5 w-5" />
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto bg-slate-950 px-8 py-10">
+        {notificationOpen ? (
+          <div className="border-b border-slate-900/60 bg-slate-950/90 px-10 py-4">
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <p className="text-xs uppercase tracking-wide text-slate-500">Latest alerts</p>
+                <ul className="mt-3 grid gap-2 text-sm text-slate-200">
+                  {notifications.map((notification) => (
+                    <li
+                      key={notification.id}
+                      className="flex items-center justify-between rounded-xl border border-slate-800/60 bg-slate-900/60 px-4 py-3"
+                    >
+                      <span>{notification.message}</span>
+                      <span className="text-xs text-slate-500">{notification.timestamp}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <main className="flex-1 overflow-y-auto bg-slate-950 px-10 py-10">
           <Outlet />
         </main>
       </div>
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} items={paletteItems} />
     </div>
   );
 }

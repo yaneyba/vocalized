@@ -13,3 +13,9 @@ export const formatDateTime = (value: string) =>
     minute: "2-digit",
   });
 
+export const formatCurrency = (value: number, digits = 0) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: digits,
+  }).format(value);
