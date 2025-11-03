@@ -66,7 +66,6 @@ export function AdminLayout() {
   const handleSignOut = async () => {
     setUserMenuOpen(false);
     await signOut();
-    navigate("/login", { replace: true });
   };
 
   useEffect(() => {
