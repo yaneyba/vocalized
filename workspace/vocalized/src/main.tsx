@@ -6,6 +6,7 @@ import "./index.css";
 import { DataProviderContext } from "./providers/DataProviderContext";
 import { DataProviderFactory } from "./data/DataProviderFactory";
 import { ToastProvider } from "./providers/ToastProvider";
+import { AuthProvider } from "./providers/AuthContext";
 
 const dataProvider = DataProviderFactory.create("mock");
 
@@ -14,10 +15,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <DataProviderContext.Provider value={dataProvider}>
         <ToastProvider>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </ToastProvider>
       </DataProviderContext.Provider>
     </BrowserRouter>
   </React.StrictMode>,
 );
-

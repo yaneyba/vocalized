@@ -9,12 +9,16 @@ import { AnalyticsPage } from "./pages/analytics/AnalyticsPage";
 import { BillingPage } from "./pages/billing/BillingPage";
 import { SettingsPage } from "./pages/settings/SettingsPage";
 import { AuthPage } from "./pages/auth/AuthPage";
+import { LandingPage } from "./pages/LandingPage";
+import { useAuth } from "./providers/AuthContext";
+import { useMemo } from "react";
 
 function App() {
   return (
     <Routes>
-      <Route path="/auth" element={<AuthPage />} />
-      <Route element={<RootLayout />}>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/auth" element={<AuthRoute />} />
+      <Route element={<ProtectedLayout />}>
         <Route index element={<DashboardHome />} />
         <Route path="agents">
           <Route index element={<AgentsPage />} />
@@ -34,3 +38,36 @@ function App() {
 
 export default App;
 
+function ProtectedLayout() {
+  const { user, loading } = useAuth();
+  const content = useMemo(() => {
+    if (loading) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
+          Loading workspace…
+        </div>
+      );
+    }
+    if (!user) {
+      return <Navigate to="/auth" replace />;
+    }
+    return <RootLayout />;
+  }, [loading, user]);
+
+  return content;
+}
+
+function AuthRoute() {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-400">
+        Loading…
+      </div>
+    );
+  }
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+  return <AuthPage />;
+}

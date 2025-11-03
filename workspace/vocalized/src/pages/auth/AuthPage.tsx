@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { Bot, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { useToast } from "../../providers/ToastProvider";
+import { useAuth } from "../../providers/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 type AuthMode = "login" | "signup";
 
 export function AuthPage() {
   const [mode, setMode] = useState<AuthMode>("login");
   const { pushToast } = useToast();
+  const { signIn, loading } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 via-white to-slate-100 lg:flex-row">
@@ -74,26 +80,42 @@ export function AuthPage() {
 
           <form
             className="mt-8 space-y-5"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
+              await signIn({ email, password });
               pushToast({
-                title: mode === "login" ? "Welcome back" : "Account created",
+                title: mode === "login" ? "Welcome back" : "Workspace created",
                 description:
                   mode === "login"
                     ? "You are now signed in to Vocalized."
                     : "Start building your first voice agent.",
                 variant: "success",
               });
+              navigate("/", { replace: true });
             }}
           >
             <label className="block">
               <span className="text-sm font-medium text-slate-700">Email</span>
-              <input type="email" required className="input mt-2" placeholder="you@company.com" />
+              <input
+                type="email"
+                required
+                className="input mt-2"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-slate-700">Password</span>
-              <input type="password" required className="input mt-2" placeholder="••••••••" />
+              <input
+                type="password"
+                required
+                className="input mt-2"
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
             </label>
 
             {mode === "signup" ? (
@@ -113,8 +135,8 @@ export function AuthPage() {
               </button>
             </div>
 
-            <button type="submit" className="btn-primary w-full">
-              {mode === "login" ? "Sign in" : "Create workspace"}
+            <button type="submit" className="btn-primary w-full" disabled={loading}>
+              {loading ? "Loading…" : mode === "login" ? "Sign in" : "Create workspace"}
             </button>
           </form>
 
@@ -154,4 +176,3 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
     </div>
   );
 }
-
