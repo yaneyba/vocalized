@@ -1,3 +1,5 @@
+# CLIENT DASHBOARD (app.vocalized.app)
+
 Build a modern SaaS dashboard for "Vocalized" - an AI voice agent platform for businesses.
 
 DESIGN STYLE:
