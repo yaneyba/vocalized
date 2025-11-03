@@ -95,7 +95,7 @@ export function AnalyticsPage() {
           <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
             <h3 className="text-sm font-semibold text-white">Total calls (daily)</h3>
             <div className="mt-4 h-[260px]">
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" minHeight={220}>
                 <AreaChart data={callsSeries}>
                   <defs>
                     <linearGradient id="calls" x1="0" x2="0" y1="0" y2="1">
@@ -118,7 +118,7 @@ export function AnalyticsPage() {
           <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
             <h3 className="text-sm font-semibold text-white">Calls by provider</h3>
             <div className="mt-4 h-[260px]">
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" minHeight={220}>
                 <BarChart data={providerDistribution}>
                   <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                   <XAxis dataKey="provider" stroke="#475569" />
@@ -140,7 +140,7 @@ export function AnalyticsPage() {
           <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
             <h3 className="text-sm font-semibold text-white">Average call duration</h3>
             <div className="mt-4 h-[260px]">
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" minHeight={220}>
                 <LineChart data={callsSeries}>
                   <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                   <XAxis dataKey="day" stroke="#475569" />
@@ -154,7 +154,7 @@ export function AnalyticsPage() {
           <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
             <h3 className="text-sm font-semibold text-white">Provider latency & success</h3>
             <div className="mt-4 h-[260px]">
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" minHeight={220}>
                 <BarChart data={providerDistribution}>
                   <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                   <XAxis dataKey="provider" stroke="#475569" />
@@ -173,7 +173,7 @@ export function AnalyticsPage() {
           <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
             <h3 className="text-sm font-semibold text-white">Cost vs revenue</h3>
             <div className="mt-4 h-[260px]">
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" minHeight={220}>
                 <BarChart data={costVsRevenue}>
                   <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                   <XAxis dataKey="name" stroke="#475569" />
@@ -207,7 +207,7 @@ export function AnalyticsPage() {
           <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
             <h3 className="text-sm font-semibold text-white">Workspace growth</h3>
             <div className="mt-4 h-[260px]">
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" minHeight={220}>
                 <LineChart data={growthSeries}>
                   <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                   <XAxis dataKey="month" stroke="#475569" />

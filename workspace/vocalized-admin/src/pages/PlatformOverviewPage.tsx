@@ -114,7 +114,7 @@ export function PlatformOverviewPage() {
             <button className="admin-btn-ghost border border-slate-800">Download CSV</button>
           </header>
           <div className="mt-6 h-[260px]">
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" minHeight={220}>
               <AreaChart data={revenueSeries}>
                 <defs>
                   <linearGradient id="rev" x1="0" x2="0" y1="0" y2="1">

@@ -275,10 +275,10 @@ function WorkspaceDetailModal({ workspaceId, onClose }: WorkspaceDetailModalProp
               </dl>
             </div>
 
-            <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-4">
-              <h3 className="text-sm font-semibold text-white">Usage (7d)</h3>
-              <div className="mt-4 h-[160px]">
-                <ResponsiveContainer>
+          <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-4">
+            <h3 className="text-sm font-semibold text-white">Usage (7d)</h3>
+            <div className="mt-4 h-[160px]">
+                <ResponsiveContainer width="100%" minHeight={160}>
                   <AreaChart data={data?.usage ?? []}>
                     <defs>
                       <linearGradient id="usage" x1="0" x2="0" y1="0" y2="1">

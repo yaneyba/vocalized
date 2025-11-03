@@ -62,7 +62,7 @@ export function BillingPage() {
             <button className="admin-btn-ghost border border-slate-800">Download CSV</button>
           </header>
           <div className="mt-4 h-[260px]">
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" minHeight={220}>
               <PieChart>
                 <Pie
                   data={revenueByTier}

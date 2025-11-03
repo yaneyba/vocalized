@@ -71,7 +71,7 @@ export function IntegrationsPage() {
         <aside className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
           <h3 className="text-sm font-semibold text-white">Usage distribution</h3>
           <div className="mt-4 h-[260px]">
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" minHeight={220}>
               <BarChart data={usageChart}>
                 <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                 <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} />

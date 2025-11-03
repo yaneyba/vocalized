@@ -134,7 +134,7 @@ export function ProvidersPage() {
         <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
           <h3 className="text-sm font-semibold text-white">Performance comparison</h3>
           <div className="mt-4 h-[220px]">
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" minHeight={220}>
               <LineChart data={latencyTrend}>
                 <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                 <XAxis dataKey="name" stroke="#475569" />
@@ -152,7 +152,7 @@ export function ProvidersPage() {
         <div className="rounded-2xl border border-slate-900 bg-slate-900/60 p-5">
           <h3 className="text-sm font-semibold text-white">Cost vs revenue</h3>
           <div className="mt-4 h-[220px]">
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" minHeight={220}>
               <BarChart data={costComparison}>
                 <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
                 <XAxis dataKey="provider" stroke="#475569" />
