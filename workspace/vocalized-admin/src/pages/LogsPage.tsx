@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Download, Filter, RefreshCcw, Search } from "lucide-react";
 import { fetchLogs, logEntries, type LogEntry } from "../data/adminData";
 import { cn, formatDateTime } from "../lib/utils";
+import { Pagination } from "../components/Pagination";
 
 const levels: LogEntry["level"][] = ["error", "warn", "info"];
 
@@ -11,6 +12,8 @@ export function LogsPage() {
   const [level, setLevel] = useState<LogEntry["level"] | "all">("all");
   const [search, setSearch] = useState("");
   const [workerFilter, setWorkerFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -34,6 +37,15 @@ export function LogsPage() {
       return matchesLevel && matchesWorker && matchesSearch;
     });
   }, [data, level, workerFilter, search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [level, workerFilter, search, data]);
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
 
   const errorGroups = useMemo(() => {
     const grouped = new Map<string, number>();
@@ -110,7 +122,7 @@ export function LogsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-900">
-              {filtered.slice(0, 80).map((entry) => (
+            {paginated.map((entry) => (
                 <tr key={entry.id} className="align-top hover:bg-slate-900/50">
                   <td className="px-5 py-3 text-xs text-slate-500">{formatDateTime(entry.timestamp)}</td>
                   <td className="px-5 py-3 text-xs text-slate-400">{entry.worker}</td>
@@ -137,6 +149,8 @@ export function LogsPage() {
           </ul>
         </div>
       </div>
+
+      <Pagination page={page} pageSize={pageSize} total={filtered.length} onPageChange={setPage} />
     </div>
   );
 }

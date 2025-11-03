@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Archive, Download, Filter, MoreHorizontal, PauseCircle, Play, Trash2 } from "lucide-react";
 import {
@@ -8,6 +8,7 @@ import {
 } from "../data/adminData";
 import { cn, formatCurrency, formatDateTime } from "../lib/utils";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Pagination } from "../components/Pagination";
 
 const statusFilters = ["All", "Active", "Trial", "Suspended"];
 const tierFilters = ["All", "Starter", "Growth", "Scale", "Enterprise"];
@@ -23,6 +24,8 @@ export function WorkspacesPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   const filtered = useMemo(() => {
     return workspaces.filter((workspace) => {
@@ -38,19 +41,33 @@ export function WorkspacesPage() {
     });
   }, [workspaces, status, tier, search]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [status, tier, search]);
+
+  useEffect(() => {
+    setSelected((current) => current.filter((id) => filtered.some((workspace) => workspace.id === id)));
+  }, [filtered]);
+
+  const currentPageItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
+
   const toggleSelection = (id: string) => {
     setSelected((current) =>
       current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
     );
   };
 
-  const allChecked = selected.length > 0 && selected.length === filtered.length;
+  const allChecked =
+    currentPageItems.length > 0 && currentPageItems.every((workspace) => selected.includes(workspace.id));
 
   const toggleAll = () => {
     if (allChecked) {
-      setSelected([]);
+      setSelected((current) => current.filter((id) => !currentPageItems.some((workspace) => workspace.id === id)));
     } else {
-      setSelected(filtered.map((workspace) => workspace.id));
+      setSelected((current) => Array.from(new Set([...current, ...currentPageItems.map((workspace) => workspace.id)])));
     }
   };
 
@@ -138,7 +155,7 @@ export function WorkspacesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-900 text-slate-300">
-            {filtered.map((workspace) => (
+            {currentPageItems.map((workspace) => (
               <tr
                 key={workspace.id}
                 className="cursor-pointer hover:bg-slate-900/50"
@@ -177,6 +194,8 @@ export function WorkspacesPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} pageSize={pageSize} total={filtered.length} onPageChange={setPage} />
 
       <WorkspaceDetailModal
         workspaceId={activeWorkspaceId}

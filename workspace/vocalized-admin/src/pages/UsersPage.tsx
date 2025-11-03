@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Eye, Filter, Lock, Mail, Trash2 } from "lucide-react";
+import { Eye, Filter, Lock, Trash2 } from "lucide-react";
 import { fetchUsers, getUserDetail, type UserSummary } from "../data/adminData";
 import { cn, formatDateTime } from "../lib/utils";
+import { Pagination } from "../components/Pagination";
 
 const statusFilters = ["All", "Active", "Invited", "Suspended"];
 
@@ -11,6 +12,8 @@ export function UsersPage() {
   const [status, setStatus] = useState<string>("All");
   const [search, setSearch] = useState("");
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   const filtered = useMemo(() => {
     return users.filter((user) => {
@@ -21,6 +24,15 @@ export function UsersPage() {
       return matchesStatus && matchesSearch;
     });
   }, [users, status, search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [status, search]);
+
+  const currentPageItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
 
   return (
     <div className="space-y-8">
@@ -64,7 +76,7 @@ export function UsersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-900">
-            {filtered.map((user) => (
+            {currentPageItems.map((user) => (
               <tr key={user.id} className="hover:bg-slate-900/50">
                 <td className="px-5 py-4">
                   <div>
@@ -98,6 +110,8 @@ export function UsersPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} pageSize={pageSize} total={filtered.length} onPageChange={setPage} />
 
       <UserDetailModal id={activeUserId} onClose={() => setActiveUserId(null)} />
     </div>

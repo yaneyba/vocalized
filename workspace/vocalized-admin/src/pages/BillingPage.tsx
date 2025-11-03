@@ -1,12 +1,19 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { fetchInvoices, fetchWorkspaces, invoices } from "../data/adminData";
 import { cn, formatCurrency } from "../lib/utils";
+import { Pagination } from "../components/Pagination";
 
 export function BillingPage() {
   const { data: invoiceList = invoices } = useQuery({ queryKey: ["invoices"], queryFn: fetchInvoices });
   const { data: workspaces = [] } = useQuery({ queryKey: ["workspaces"], queryFn: fetchWorkspaces });
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  useEffect(() => {
+    setPage(1);
+  }, [invoiceList]);
 
   const revenue30 = useMemo(() => workspaces.reduce((total, workspace) => total + workspace.revenue, 0), [workspaces]);
   const mrr = revenue30 / 12;
@@ -30,6 +37,10 @@ export function BillingPage() {
       { paid: 0, pending: 0, overdue: 0 },
     );
   }, [invoiceList]);
+  const paginatedInvoices = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return invoiceList.slice(start, start + pageSize);
+  }, [invoiceList, page, pageSize]);
 
   return (
     <div className="space-y-8">
@@ -115,7 +126,7 @@ export function BillingPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-900">
-              {invoiceList.map((invoice) => (
+              {paginatedInvoices.map((invoice) => (
                 <tr key={invoice.id} className="hover:bg-slate-900/50">
                   <td className="px-5 py-4 text-white">{invoice.workspace}</td>
                   <td className="px-5 py-4 text-right text-white">{formatCurrency(invoice.balance)}</td>
@@ -141,6 +152,8 @@ export function BillingPage() {
           </table>
         </div>
       </section>
+
+      <Pagination page={page} pageSize={pageSize} total={invoiceList.length} onPageChange={setPage} />
     </div>
   );
 }
