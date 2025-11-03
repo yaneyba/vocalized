@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./workspace/vocalized" },
+    { "path": "./workspace/vocalized-admin" }
+  ]
+}
