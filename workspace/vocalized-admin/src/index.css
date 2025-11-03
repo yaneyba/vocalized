@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-slate-950 font-sans text-slate-100;
+}
+
+.admin-shell {
+  @apply grid min-h-screen grid-cols-[260px_1fr] bg-slate-950;
+}
+
+.admin-card {
+  @apply rounded-2xl bg-slate-900/80 p-5 shadow-card backdrop-blur;
+}
+
+.admin-badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+}
+
+.admin-btn {
+  @apply inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition;
+}
+
+.admin-btn-primary {
+  @apply admin-btn bg-primary-accent text-white hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400;
+}
+
+.admin-btn-ghost {
+  @apply admin-btn bg-slate-900/60 text-slate-300 hover:bg-slate-800/90;
+}

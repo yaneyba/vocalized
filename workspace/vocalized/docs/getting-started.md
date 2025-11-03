@@ -20,7 +20,7 @@ This installs React, Vite, Tailwind CSS, Lucide icons, Recharts, and TypeScript 
 - **Start dev server**
 
   ```bash
-  npm run dev
+  npm run dev --workspace vocalized
   ```
 
   Vite serves the app on `http://localhost:5173` with fast refresh.
@@ -28,7 +28,7 @@ This installs React, Vite, Tailwind CSS, Lucide icons, Recharts, and TypeScript 
 - **Type check & build**
 
   ```bash
-  npm run build
+  npm run build --workspace vocalized
   ```
 
   Runs TypeScript for type checking and builds the production bundle to `dist/`.
@@ -36,7 +36,7 @@ This installs React, Vite, Tailwind CSS, Lucide icons, Recharts, and TypeScript 
 - **Preview production build**
 
   ```bash
-  npm run preview
+  npm run preview --workspace vocalized
   ```
 
   Serves the contents of `dist/` with Vite’s preview server.
@@ -64,4 +64,3 @@ This installs React, Vite, Tailwind CSS, Lucide icons, Recharts, and TypeScript 
 - **Build size warning** — Vite warns about bundle size; consider lazy-loading routes or splitting vendor chunks if needed.
 
 If you run into issues not covered here, document the fix in this folder so the next engineer benefits from it.
-
