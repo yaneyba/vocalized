@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, LogIn, Mail } from "lucide-react";
+import { ArrowLeft, Lock, LogIn, Mail } from "lucide-react";
 import { useAuth } from "../providers/AuthContext";
 
 export function LoginPage() {
@@ -25,9 +25,18 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-6 py-12 text-slate-100">
       <div className="w-full max-w-md rounded-3xl border border-slate-900 bg-slate-900/60 p-10 shadow-card">
-        <div className="flex items-center gap-3 text-blue-400">
-          <Lock className="h-6 w-6" />
-          <h1 className="text-lg font-semibold">Vocalized Admin</h1>
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => navigate("/", { replace: true })}
+            className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500 transition hover:text-slate-200"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to site
+          </button>
+          <div className="flex items-center gap-3 text-blue-400">
+            <Lock className="h-6 w-6" />
+            <h1 className="text-lg font-semibold">Vocalized Admin</h1>
+          </div>
         </div>
         <p className="mt-2 text-sm text-slate-400">Secure access to platform controls.</p>
 

@@ -12,16 +12,15 @@ import { SystemPage } from "./pages/SystemPage";
 import { LogsPage } from "./pages/LogsPage";
 import { AdminActivityPage } from "./pages/AdminActivityPage";
 import { useAuth } from "./providers/AuthContext";
+import { LandingPage } from "./pages/LandingPage";
 import { useMemo } from "react";
-
-const defaultRedirect = <Navigate to="/overview" replace />;
 
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginRoute />} />
       <Route element={<ProtectedLayout />}>
-        <Route index element={defaultRedirect} />
         <Route path="overview" element={<PlatformOverviewPage />} />
         <Route path="workspaces" element={<WorkspacesPage />} />
         <Route path="users" element={<UsersPage />} />
@@ -33,7 +32,7 @@ function App() {
         <Route path="logs" element={<LogsPage />} />
         <Route path="activity" element={<AdminActivityPage />} />
       </Route>
-      <Route path="*" element={defaultRedirect} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
