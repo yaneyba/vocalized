@@ -5,15 +5,26 @@ const clientRoutes = new Hono<{ Bindings: Env }>();
 
 // Client authentication routes
 import authRoutes from './auth';
+import workspaceRoutes from './workspaces';
+
 clientRoutes.route('/auth', authRoutes);
+clientRoutes.route('/workspaces', workspaceRoutes);
 
 // TODO: Add other client route modules
-// import workspaceRoutes from './workspaces';
 // import templateRoutes from './templates';
+// import agentRoutes from './agents';
+// import phoneRoutes from './phone-numbers';
+// import callRoutes from './calls';
+// import analyticsRoutes from './analytics';
+// import billingRoutes from './billing';
 // import webhookRoutes from './webhooks';
 
-// clientRoutes.route('/workspaces', workspaceRoutes);
 // clientRoutes.route('/templates', templateRoutes);
+// clientRoutes.route('/agents', agentRoutes);
+// clientRoutes.route('/phone-numbers', phoneRoutes);
+// clientRoutes.route('/calls', callRoutes);
+// clientRoutes.route('/analytics', analyticsRoutes);
+// clientRoutes.route('/billing', billingRoutes);
 // clientRoutes.route('/webhooks', webhookRoutes);
 
 // Temporary: List all client routes

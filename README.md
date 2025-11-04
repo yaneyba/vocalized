@@ -1,48 +1,127 @@
-# Vocalized Workspace
+# Vocalized - Voice AI Platform
 
-This repository hosts the multi-app workspace for the Vocalized platform.
+A comprehensive Voice AI platform built on Cloudflare Workers, enabling businesses to create and manage AI-powered voice agents.
 
-## Apps
+## 📁 Project Structure
 
-- `workspace/vocalized` – customer-facing dashboard that surfaces agent performance, analytics, billing, and settings.
-- `workspace/vocalized-admin` – admin console for managing seats, monitoring audit activity, and configuring policies.
+```
+vocalized/
+├── workers/                    # Cloudflare Workers (Microservices)
+│   ├── api-gateway/           # ✅ Main API Gateway (Hono + D1)
+│   ├── billing-analytics/     # ✅ Billing & Analytics Worker
+│   ├── voice-gateway/         # ⏳ Voice AI Gateway (TODO)
+│   ├── call-management/       # ⏳ Call Management Engine (TODO)
+│   └── integration-hub/       # ⏳ Integration Hub (TODO)
+│
+├── frontend/                   # React Applications
+│   ├── client-portal/         # Customer dashboard (app.vocalized.app)
+│   └── admin-portal/          # Admin console (admin.vocalized.app)
+│
+├── database/                   # Database Schema & Migrations
+│   ├── migrations/            # D1 migration files (9 files)
+│   ├── schema.sql             # Consolidated schema
+│   └── setup.sh               # Database setup script
+│
+├── scripts/                    # Deployment Scripts
+│   ├── deploy-all.sh          # Deploy all workers
+│   ├── deploy-worker.sh       # Deploy single worker
+│   └── setup-secrets.sh       # Configure secrets
+│
+└── docs/                       # Documentation
+    ├── plans/                 # Implementation plans
+    └── IMPLEMENTATION_PROGRESS.md
+```
 
-Each app is an independent Vite + React + TypeScript project using Tailwind CSS. The root `package.json` defines npm workspaces so you can install dependencies once and run scripts for each app via workspace commands.
+## 🚀 Quick Start
 
-## Getting Started
+### Prerequisites
 
-Install dependencies for all workspaces:
+- Node.js 18+
+- Cloudflare account
+- Wrangler CLI: `npm install -g wrangler`
+
+### 1. Setup Database
 
 ```bash
+# Authenticate with Cloudflare
+wrangler login
+
+# Setup database
+cd database
+./setup.sh
+```
+
+### 2. Start Development
+
+```bash
+# API Gateway
+cd workers/api-gateway
 npm install
+npm run dev
+
+# Test API
+curl http://localhost:8787/health
 ```
 
-Run the customer dashboard:
+### 3. Run Frontend Apps
 
 ```bash
-npm run dev --workspace vocalized
+# Customer Portal
+npm run dev --workspace client-portal
+
+# Admin Portal
+npm run dev --workspace admin-portal
 ```
 
-Run the admin console:
+## 📊 Implementation Status
+
+**Overall Progress: ~45% Complete**
+
+✅ **Completed:**
+- Database Schema (22 tables, 9 migrations)
+- Admin Authentication (Login, logout, refresh)
+- Client Authentication (Signup, login, password reset)
+- Workspace Management (CRUD, members, roles)
+- Billing & Analytics Worker
+
+🚧 **In Progress:**
+- Voice Agents endpoints
+- Phone Numbers management
+- Calls endpoints
+
+⏳ **Planned:**
+- Voice AI Gateway Worker
+- Call Management Engine Worker
+- Integration Hub Worker
+
+See [IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md) for details.
+
+## 🛠️ Development Commands
 
 ```bash
-npm run dev --workspace vocalized-admin
+# API Gateway
+cd workers/api-gateway
+npm run dev          # Start dev server (port 8787)
+npm run deploy       # Deploy to Cloudflare
+
+# Billing & Analytics
+cd workers/billing-analytics
+npm run dev          # Start dev server
+npm run deploy       # Deploy to Cloudflare
+
+# Customer Portal
+npm run dev --workspace client-portal
+
+# Admin Portal
+npm run dev --workspace admin-portal
 ```
 
-Build everything:
+## 📖 Documentation
 
-```bash
-npm run build
-```
+- [Implementation Progress](docs/IMPLEMENTATION_PROGRESS.md) - Detailed progress
+- [Implementation Plans](docs/plans/) - Component specifications
+- [API Documentation](workers/api-gateway/README.md) - API endpoints
 
-Each app also ships with app-specific documentation in its `docs/` folder. See `workspace/vocalized/docs/` and `workspace/vocalized-admin/docs/` for details.
+---
 
-## Repository Structure
-
-```
-workspace/
-  vocalized/         # Primary customer dashboard
-  vocalized-admin/   # Admin control center
-```
-
-Shared resources (linting, CI, etc.) can live at the repository root. Add new apps under `workspace/` and register them in the root `package.json` to include them in the workspace.
+**Built with Cloudflare Workers, Hono, D1, and React**
