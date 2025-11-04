@@ -1,0 +1,28 @@
+{
+  "name": "vocalized-api",
+  "version": "1.0.0",
+  "description": "Vocalized Voice AI Platform - Cloudflare Workers API",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "db:create": "wrangler d1 create vocalized-db",
+    "db:migrate": "wrangler d1 migrations apply vocalized-db",
+    "db:migrate:local": "wrangler d1 migrations apply vocalized-db --local",
+    "db:console": "wrangler d1 execute vocalized-db",
+    "db:console:local": "wrangler d1 execute vocalized-db --local",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "wrangler": "^4.45.4"
+  }
+}

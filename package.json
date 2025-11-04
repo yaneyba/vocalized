@@ -8,7 +8,8 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "dev:vocalized": "npm run dev --workspace vocalized",
-    "dev:vocalized-admin": "npm run dev --workspace vocalized-admin"
+    "dev:vocalized-admin": "npm run dev --workspace vocalized-admin",
+    "dev:api": "npm run dev --workspace vocalized-api"
   }
 }
 
