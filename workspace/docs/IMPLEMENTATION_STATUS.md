@@ -1,4 +1,5 @@
 # Vocalized Platform - Implementation Status
+# Note: Use the documents inside the /plans folder
 
 Last Updated: 2025-11-04
 
