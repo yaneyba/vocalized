@@ -215,6 +215,9 @@ All SQL migration files are in `workspace/vocalized-api/schema/migrations/`:
 ```
 vocalized/
 ├── workspace/
+│   ├── docs/                   # Project documentation
+│   │   └── IMPLEMENTATION_STATUS.md  # This file
+│   │
 │   ├── vocalized/              # Customer frontend (React + Vite)
 │   │   ├── src/
 │   │   │   ├── components/     # UI components
@@ -247,8 +250,6 @@ vocalized/
 │       ├── tsconfig.json
 │       ├── README.md
 │       └── SETUP.md            # Setup instructions
-│
-└── IMPLEMENTATION_STATUS.md    # This file
 ```
 
 ---
@@ -360,11 +361,11 @@ curl http://localhost:8787/health
 
 ## 🔗 Related Documentation
 
-- [API README](workspace/vocalized-api/README.md) - API documentation
-- [API Setup Guide](workspace/vocalized-api/SETUP.md) - Detailed setup instructions
-- [Original Plans](workspace/vocalized/docs/PLANS.md) - Complete platform specification
-- [Architecture](workspace/vocalized/docs/architecture.md) - System architecture
-- [Data Layer](workspace/vocalized/docs/data-layer.md) - Data provider pattern
+- [API README](../vocalized-api/README.md) - API documentation
+- [API Setup Guide](../vocalized-api/SETUP.md) - Detailed setup instructions
+- [Original Plans](../vocalized/docs/PLANS.md) - Complete platform specification
+- [Architecture](../vocalized/docs/architecture.md) - System architecture
+- [Data Layer](../vocalized/docs/data-layer.md) - Data provider pattern
 
 ---
 
