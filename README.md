@@ -66,11 +66,15 @@ curl http://localhost:8787/health
 ### 3. Run Frontend Apps
 
 ```bash
-# Customer Portal
-npm run dev --workspace client-portal
+# Client Portal
+cd frontend/client-portal
+npm install
+npm run dev
 
 # Admin Portal
-npm run dev --workspace admin-portal
+cd frontend/admin-portal
+npm install
+npm run dev
 ```
 
 ## 📊 Implementation Status
@@ -107,11 +111,13 @@ cd workers/billing-analytics
 npm run dev          # Start dev server
 npm run deploy       # Deploy to Cloudflare
 
-# Customer Portal
-npm run dev --workspace client-portal
+# Client Portal
+cd frontend/client-portal
+npm run dev          # Start dev server (port 5173)
 
 # Admin Portal
-npm run dev --workspace admin-portal
+cd frontend/admin-portal
+npm run dev          # Start dev server (port 5183)
 ```
 
 ## 🚀 Deployment URLs
@@ -123,7 +129,7 @@ Once deployed, services will be accessible at:
 | API Gateway | `localhost:8787` | `api.vocalized.app` |
 | Billing & Analytics | `localhost:8791` | `billing.vocalized.app` |
 | Client Portal | `localhost:5173` | `app.vocalized.app` |
-| Admin Portal | `localhost:4173` | `admin.vocalized.app` |
+| Admin Portal | `localhost:5183` | `admin.vocalized.app` |
 | Voice Gateway | `localhost:8788` | `voice.vocalized.app` (TODO) |
 | Call Management | `localhost:8789` | `calls.vocalized.app` (TODO) |
 | Integration Hub | `localhost:8790` | `integrations.vocalized.app` (TODO) |
