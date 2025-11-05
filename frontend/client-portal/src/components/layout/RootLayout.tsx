@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   BarChart3,
   Bot,
@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useAuth } from "../../providers/AuthContext";
 
 const navigation = [
   { label: "Dashboard", path: "/", icon: Gauge },
@@ -28,8 +29,15 @@ const navigation = [
 
 export function RootLayout() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [workspace, setWorkspace] = useState("Vocalized Labs");
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/auth");
+  };
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -154,6 +162,7 @@ export function RootLayout() {
             <p>© {new Date().getFullYear()} Vocalized Labs. All rights reserved.</p>
             <button
               type="button"
+              onClick={handleLogout}
               className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:bg-slate-200"
             >
               <LogOut className="h-3.5 w-3.5" />
