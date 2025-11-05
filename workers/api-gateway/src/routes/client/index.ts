@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import type { Env } from '../../types/env';
+import type { Env } from '@/types/env';
 
 const clientRoutes = new Hono<{ Bindings: Env }>();
 

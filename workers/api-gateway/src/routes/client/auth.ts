@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import type { Env } from '../../types/env';
-import { hashPassword, verifyPassword, signJWT, generateId } from '../../utils/crypto';
-import { authenticate } from '../../middleware/auth';
+import type { Env } from '@/types/env';
+import { hashPassword, verifyPassword, signJWT, generateId } from '@/utils/crypto';
+import { authenticate } from '@/middleware/auth';
 
 const authRoutes = new Hono<{ Bindings: Env }>();
 

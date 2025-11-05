@@ -1,12 +1,16 @@
 import { Hono } from 'hono';
-import type { Env } from '../../types/env';
-import { authenticate, requireWorkspaceAccess, requireWorkspaceRole } from '../../middleware/auth';
-import { generateId } from '../../utils/crypto';
+import type { Env } from '@/types/env';
+import { authenticate, requireWorkspaceAccess, requireWorkspaceRole } from '@/middleware/auth';
+import { generateId } from '@/utils/crypto';
+import agentsRoutes from './agents';
 
 const workspacesRoutes = new Hono<{ Bindings: Env }>();
 
 // Apply authentication to all routes
 workspacesRoutes.use('*', authenticate);
+
+// Mount agents sub-routes
+workspacesRoutes.route('/', agentsRoutes);
 
 // POST /workspaces - Create a new workspace
 workspacesRoutes.post('/', async (c) => {
