@@ -1,8 +1,8 @@
 # Vocalized Platform - Project Structure
 
-**Last Updated**: 2025-11-04
+**Last Updated**: 2025-11-05
 
-This document describes the reorganized project structure that follows the deployment pattern specified in [plans/8. DEPLOYMENT & CONFIGURATION.md](plans/8.%20DEPLOYMENT%20%26%20CONFIGURATION.md).
+This document describes the current project structure that follows the deployment pattern specified in [plans/8. DEPLOYMENT & CONFIGURATION.md](plans/8.%20DEPLOYMENT%20%26%20CONFIGURATION.md).
 
 ---
 
@@ -114,7 +114,7 @@ vocalized/
 │   └── setup-secrets.sh               # ✅ Configure secrets
 │
 ├── docs/                              # Documentation
-│   ├── plans/                         # ✅ Implementation plans
+│   ├── plans/                         # ✅ Implementation plans (13 files)
 │   │   ├── 1. DATABASE SCHEMA.md
 │   │   ├── 2. API Endpoints.md
 │   │   ├── 3. AUTHENTICATION & AUTHORIZATION.md
@@ -129,12 +129,9 @@ vocalized/
 │   │   ├── 7. BILLING & ANALYTICS - Part 2.md
 │   │   ├── 7. BILLING & ANALYTICS - Part 3.md
 │   │   └── 8. DEPLOYMENT & CONFIGURATION.md
-│   ├── IMPLEMENTATION_STATUS.md       # ✅ Original status
-│   ├── IMPLEMENTATION_PROGRESS.md     # ✅ Detailed progress
+│   ├── IMPLEMENTATION_PROGRESS.md     # ✅ Current implementation status
+│   ├── TESTING.md                     # ✅ Testing strategy & documentation
 │   └── PROJECT_STRUCTURE.md           # ✅ This file
-│
-├── workspace/                         # ⏳ Legacy - to be removed
-│   └── ...                            # Old structure
 │
 ├── package.json                       # Root workspace config
 ├── tsconfig.json                      # Root TypeScript config
@@ -222,17 +219,39 @@ Once deployed, workers will be accessible at:
 
 ---
 
-## 🔄 Migration from Old Structure
+## 📝 Development Workflow
 
-The old structure under `workspace/` is being migrated to the new pattern:
+### Running Workers Locally
 
-**Old → New Mapping:**
+Each worker can be run independently:
+
+```bash
+# API Gateway
+cd workers/api-gateway
+npm run dev  # Runs on localhost:8787
+
+# Billing & Analytics
+cd workers/billing-analytics
+npm run dev  # Configure port in wrangler.toml
 ```
-workspace/vocalized-api/          → workers/api-gateway/
-workspace/vocalized-billing-analytics/ → workers/billing-analytics/
-workspace/vocalized/              → frontend/client-portal/
-workspace/vocalized-admin/        → frontend/admin-portal/
-workspace/docs/                   → docs/
+
+### Running Frontend Apps
+
+```bash
+# Client Portal
+cd frontend/client-portal
+npm run dev  # Runs on localhost:5173
+
+# Admin Portal
+cd frontend/admin-portal
+npm run dev  # Runs on localhost:5174
+```
+
+### Database Setup
+
+```bash
+cd database
+./setup.sh
 ```
 
 ---
@@ -240,25 +259,34 @@ workspace/docs/                   → docs/
 ## 📝 Next Steps
 
 1. **Complete remaining workers**:
-   - Voice Gateway
-   - Call Management Engine
-   - Integration Hub
+   - Voice Gateway (multi-provider voice AI routing)
+   - Call Management Engine (call orchestration & webhooks)
+   - Integration Hub (CRM & calendar integrations)
 
-2. **Remove legacy workspace/ directory** once migration is verified
+2. **Implement remaining API endpoints**:
+   - Voice Agents CRUD
+   - Phone Numbers management
+   - Calls history & management
+   - Admin dashboard endpoints
 
-3. **Update package.json workspaces** to reference new structure
-
-4. **Update CI/CD pipelines** to use new paths
+3. **Frontend Integration**:
+   - Connect React apps to API Gateway
+   - Replace mock data with real API calls
+   - Implement real-time updates
 
 ---
 
 ## 🔗 Related Documentation
 
 - [Main README](../README.md) - Quick start guide
-- [Implementation Progress](IMPLEMENTATION_PROGRESS.md) - Current status
+- [Implementation Progress](IMPLEMENTATION_PROGRESS.md) - Current implementation status & tracking
+- [Testing Documentation](TESTING.md) - Testing strategy, running tests, and coverage
 - [Deployment Plans](plans/8.%20DEPLOYMENT%20%26%20CONFIGURATION.md) - Deployment specifications
+- [API Endpoints Spec](plans/2.%20API%20Endpoints.md) - Complete API endpoint specifications
+- [Database Schema](plans/1.%20DATABASE%20SCHEMA.md) - Database structure and migrations
 
 ---
 
-**Structure Last Updated**: 2025-11-04
+**Structure Last Updated**: 2025-11-05
+**Status**: Current & Active
 **Follows Pattern From**: `docs/plans/8. DEPLOYMENT & CONFIGURATION.md`
