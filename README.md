@@ -75,26 +75,24 @@ npm run dev --workspace admin-portal
 
 ## 📊 Implementation Status
 
-**Overall Progress: ~45% Complete**
+**Overall Progress: ~50% Complete**
 
 ✅ **Completed:**
 - Database Schema (22 tables, 9 migrations)
 - Admin Authentication (Login, logout, refresh)
 - Client Authentication (Signup, login, password reset)
 - Workspace Management (CRUD, members, roles)
+- Voice Agents Management (8 endpoints)
 - Billing & Analytics Worker
 
-🚧 **In Progress:**
-- Voice Agents endpoints
+⏳ **Next Priority:**
 - Phone Numbers management
 - Calls endpoints
-
-⏳ **Planned:**
 - Voice AI Gateway Worker
 - Call Management Engine Worker
 - Integration Hub Worker
 
-See [IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md) for details.
+See [IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md) for detailed progress.
 
 ## 🛠️ Development Commands
 
@@ -116,11 +114,26 @@ npm run dev --workspace client-portal
 npm run dev --workspace admin-portal
 ```
 
+## 🚀 Deployment URLs
+
+Once deployed, services will be accessible at:
+
+| Service | Development | Production |
+|---------|-------------|------------|
+| API Gateway | `localhost:8787` | `api.vocalized.app` |
+| Billing & Analytics | `localhost:8791` | `billing.vocalized.app` |
+| Client Portal | `localhost:5173` | `app.vocalized.app` |
+| Admin Portal | `localhost:4173` | `admin.vocalized.app` |
+| Voice Gateway | `localhost:8788` | `voice.vocalized.app` (TODO) |
+| Call Management | `localhost:8789` | `calls.vocalized.app` (TODO) |
+| Integration Hub | `localhost:8790` | `integrations.vocalized.app` (TODO) |
+
 ## 📖 Documentation
 
-- [Implementation Progress](docs/IMPLEMENTATION_PROGRESS.md) - Detailed progress
-- [Implementation Plans](docs/plans/) - Component specifications
-- [API Documentation](workers/api-gateway/README.md) - API endpoints
+- [Implementation Progress](docs/IMPLEMENTATION_PROGRESS.md) - Detailed progress tracking
+- [Implementation Plans](docs/plans/) - Technical specifications
+- [Testing Documentation](docs/TESTING.md) - Testing strategy & coverage
+- [API Documentation](workers/api-gateway/README.md) - API endpoint details
 
 ---
 
