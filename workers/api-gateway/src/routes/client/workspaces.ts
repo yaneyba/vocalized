@@ -4,6 +4,7 @@ import { authenticate, requireWorkspaceAccess, requireWorkspaceRole } from '@/mi
 import { generateId } from '@/utils/crypto';
 import agentsRoutes from './agents';
 import phoneNumbersRoutes from './phone-numbers';
+import callsRoutes from './calls';
 
 const workspacesRoutes = new Hono<{ Bindings: Env }>();
 
@@ -13,6 +14,7 @@ workspacesRoutes.use('*', authenticate);
 // Mount sub-routes
 workspacesRoutes.route('/', agentsRoutes);
 workspacesRoutes.route('/', phoneNumbersRoutes);
+workspacesRoutes.route('/', callsRoutes);
 
 // POST /workspaces - Create a new workspace
 workspacesRoutes.post('/', async (c) => {

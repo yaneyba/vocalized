@@ -70,6 +70,14 @@ This document outlines the testing strategy for the Vocalized platform, includin
    - ⏳ Delete number
    - ⏳ Assignment validation
 
+6. **Calls** (0 tests - TODO)
+   - ⏳ List calls with filters
+   - ⏳ Get live calls
+   - ⏳ Get call details
+   - ⏳ Get call recording
+   - ⏳ Get call transcription
+   - ⏳ Initiate outbound call
+
 ### Billing & Analytics Worker ⏳
 **Status**: TODO
 **Planned Tests**:
@@ -290,11 +298,11 @@ Client Auth:      12 tests ✅
 Workspaces:       18 tests ✅
 Voice Agents:     0 tests ⏳ TODO (8 endpoints implemented)
 Phone Numbers:    0 tests ⏳ TODO (5 endpoints implemented)
-Calls:            0 tests ⏳ (not yet implemented)
+Calls:            0 tests ⏳ TODO (6 endpoints implemented)
 Billing:          0 tests ⏳ (worker implemented, tests TODO)
 ```
 
-**Note**: Voice Agents and Phone Numbers endpoints are fully implemented but tests are pending.
+**Note**: Voice Agents, Phone Numbers, and Calls endpoints are fully implemented but tests are pending.
 
 ---
 
@@ -326,7 +334,7 @@ it('should do something', async () => {
 ### Immediate Priority:
 1. **Voice Agents Tests**: Test all 8 agent endpoints
 2. **Phone Numbers Tests**: Test all 5 phone number endpoints
-3. **Calls Tests**: Test call management endpoints (when implemented)
+3. **Calls Tests**: Test all 6 call management endpoints
 
 ### Planned:
 1. **E2E Tests**: Full workflow testing

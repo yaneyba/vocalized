@@ -79,7 +79,7 @@ npm run dev
 
 ## 📊 Implementation Status
 
-**Overall Progress: ~55% Complete**
+**Overall Progress: ~60% Complete**
 
 ✅ **Completed:**
 - Database Schema (22 tables, 9 migrations)
@@ -88,10 +88,11 @@ npm run dev
 - Workspace Management (CRUD, members, roles)
 - Voice Agents Management (8 endpoints)
 - Phone Numbers Management (5 endpoints)
+- Calls Management (6 endpoints)
 - Billing & Analytics Worker
 
 ⏳ **Next Priority:**
-- Calls endpoints
+- Admin Dashboard endpoints
 - Voice AI Gateway Worker
 - Call Management Engine Worker
 - Integration Hub Worker

@@ -5,12 +5,12 @@
 
 ---
 
-## 📊 Overall Progress: ~55% Complete
+## 📊 Overall Progress: ~60% Complete
 
 ### Completion by Phase:
 - ✅ **Phase 0** (Infrastructure): 100% Complete
 - ✅ **Phase I** (Database Schema): 100% Complete
-- 🚧 **Phase II** (API Endpoints): 50% Complete
+- 🚧 **Phase II** (API Endpoints): 60% Complete
 - 🚧 **Phase III** (Workers & Infrastructure): 25% Complete
 - ⏳ **Phase IV** (Frontend Integration): 0% Complete
 
@@ -96,6 +96,49 @@
 - Prevent deletion if assigned to agent
 - Owner/Admin only access
 - Workspace ownership verification
+
+### 3. Calls Management (100% Complete)
+**Location**: [src/routes/client/calls.ts](../workers/api-gateway/src/routes/client/calls.ts)
+
+✅ **GET /workspaces/:id/calls**
+- List all calls with pagination
+- Filter by status, direction, agent, date range
+- Include agent and phone number details
+- Comprehensive pagination support
+- Total count for UI
+
+✅ **GET /workspaces/:id/calls/live**
+- Get currently active calls
+- Filter for queued, ringing, in-progress statuses
+- Real-time call monitoring
+- Agent and number details included
+
+✅ **GET /workspaces/:id/calls/:id**
+- Get detailed call information
+- Include all call metadata
+- Parse JSON fields (metadata, events)
+- Retrieve call events timeline
+- Sentiment and summary data
+
+✅ **GET /workspaces/:id/calls/:id/recording**
+- Get call recording URL
+- Availability check
+- Ready for R2 signed URL integration
+- Expiration support (TODO)
+
+✅ **GET /workspaces/:id/calls/:id/transcription**
+- Get call transcription
+- Include AI-generated summary
+- Sentiment analysis data
+- Availability validation
+
+✅ **POST /workspaces/:id/calls/outbound**
+- Initiate outbound calls
+- E.164 phone number validation
+- Agent status verification (must be 'live')
+- Phone number assignment check
+- Call event tracking
+- Mock implementation (TODO: integrate Twilio/Telnyx)
 
 ---
 
@@ -275,6 +318,14 @@
 4. ✅ Assign phone numbers to agents
 5. ✅ Search for available numbers
 
+### Call Management
+1. ✅ List calls with filtering and pagination
+2. ✅ Monitor live calls in real-time
+3. ✅ View detailed call information
+4. ✅ Access call recordings
+5. ✅ Retrieve transcriptions with AI summaries
+6. ✅ Initiate outbound calls
+
 ### Billing & Usage
 1. ✅ Usage tracking for resources
 2. ✅ Automatic billing period creation
@@ -286,33 +337,21 @@
 
 ## ⏳ **STILL NEEDED** (Priority Order)
 
-### High Priority - Core Functionality
+### High Priority - Admin Features
 
-#### 1. Calls Endpoints
-**Required for**: Call history and management
-**Endpoints needed**:
-- `GET /workspaces/:id/calls` - List calls
-- `GET /workspaces/:id/calls/:id` - Get call details
-- `GET /workspaces/:id/calls/:id/recording` - Get recording
-- `GET /workspaces/:id/calls/:id/transcription` - Get transcription
-- `GET /workspaces/:id/calls/live` - Live calls
-- `POST /workspaces/:id/calls/outbound` - Make outbound call
-
-### Medium Priority - Admin Features
-
-#### 2. Admin Dashboard Endpoints
+#### 1. Admin Dashboard Endpoints
 - `GET /admin/dashboard/overview` - Platform metrics
 - `GET /admin/dashboard/revenue` - Revenue analytics
 - `GET /admin/dashboard/usage` - Usage statistics
 
-#### 3. Admin Workspaces Management
+#### 2. Admin Workspaces Management
 - `GET /admin/workspaces` - List all workspaces
 - `GET /admin/workspaces/:id` - Workspace details
 - `PUT /admin/workspaces/:id` - Update workspace
 - `POST /admin/workspaces/:id/suspend` - Suspend workspace
 - `POST /admin/workspaces/:id/activate` - Activate workspace
 
-#### 4. Admin Provider Management
+#### 3. Admin Provider Management
 - `GET /admin/providers` - List providers
 - `POST /admin/providers` - Add provider
 - `PUT /admin/providers/:id` - Update provider
@@ -320,7 +359,7 @@
 
 ### Critical Infrastructure
 
-#### 5. Voice AI Gateway Worker
+#### 4. Voice AI Gateway Worker
 **Purpose**: Multi-provider voice AI routing
 **Features needed**:
 - Provider abstraction layer
@@ -329,7 +368,7 @@
 - Cost optimization routing
 - API key management
 
-#### 6. Call Management Engine Worker
+#### 5. Call Management Engine Worker
 **Purpose**: Call routing and execution
 **Features needed**:
 - Twilio/Telnyx integration
@@ -338,7 +377,7 @@
 - Recording storage (R2)
 - Real-time events
 
-#### 7. Integration Hub Worker
+#### 6. Integration Hub Worker
 **Purpose**: CRM and calendar integrations
 **Features needed**:
 - OAuth flow handling
@@ -394,18 +433,19 @@ vocalized/workspace/
 ### Immediate (Next 2-4 hours):
 1. ✅ ~~Implement Voice Agents endpoints~~ - **COMPLETED**
 2. ✅ ~~Implement Phone Numbers endpoints~~ - **COMPLETED**
-3. **Implement Calls endpoints** - Needed for call history
+3. ✅ ~~Implement Calls endpoints~~ - **COMPLETED**
+4. **Implement Admin Dashboard endpoints** - Platform monitoring
 
 ### Short-term (Next 1-2 days):
-4. **Create Voice AI Gateway Worker** - Core infrastructure
-5. **Create Call Management Engine Worker** - Call handling
-6. **Implement Admin Dashboard** - Platform monitoring
+5. **Create Voice AI Gateway Worker** - Core infrastructure
+6. **Create Call Management Engine Worker** - Call handling
+7. **Implement Admin Workspaces Management** - Multi-tenant admin features
 
 ### Medium-term (Next 3-5 days):
-7. **Create Integration Hub Worker** - CRM integrations
-8. **Add Durable Objects** - For health monitoring and call state
-9. **Configure Queues** - For async processing
-10. **Frontend integration** - Connect React apps to API
+8. **Create Integration Hub Worker** - CRM integrations
+9. **Add Durable Objects** - For health monitoring and call state
+10. **Configure Queues** - For async processing
+11. **Frontend integration** - Connect React apps to API
 
 ---
 
@@ -442,9 +482,9 @@ vocalized/workspace/
 - ✅ Billing & Analytics Worker
 
 ### What's Needed for MVP:
-- ⏳ Voice Agents CRUD
-- ⏳ Phone Numbers CRUD
-- ⏳ Calls management
+- ✅ Voice Agents CRUD
+- ✅ Phone Numbers CRUD
+- ✅ Calls management
 - ⏳ Voice AI Gateway Worker
 - ⏳ Call Management Worker
 
@@ -464,13 +504,13 @@ vocalized/workspace/
 ## 📊 **METRICS**
 
 - **Total Endpoints Planned**: ~110
-- **Endpoints Implemented**: 31 (+5 Phone Numbers, +8 Voice Agents)
-- **Completion Rate**: 28.2%
+- **Endpoints Implemented**: 44 (Admin: 4, Client Auth: 6, Workspaces: 11, Agents: 8, Phone Numbers: 5, Calls: 6, Billing: 4)
+- **Completion Rate**: 40%
 - **Workers Planned**: 5
 - **Workers Created**: 2 (API Gateway, Billing & Analytics)
 - **Database Tables**: 22/22 (100%)
 - **Authentication**: 100% Complete
-- **Core Business Logic**: 50% Complete
+- **Core Business Logic**: 70% Complete
 
 ---
 
@@ -478,14 +518,15 @@ vocalized/workspace/
 
 1. ✅ ~~Focus on Voice Agents endpoints~~ - **COMPLETED**
 2. ✅ ~~Prioritize Phone Numbers endpoints~~ - **COMPLETED**
-3. **Implement Calls endpoints next** - Core to platform functionality
-4. **Consider using Zod** for request validation to improve code quality
-4. **Add comprehensive error handling** for production readiness
-5. **Implement proper logging** for debugging and monitoring
-6. **Create seeder scripts** to populate test data
-7. **Set up automated testing** before adding more features
+3. ✅ ~~Implement Calls endpoints~~ - **COMPLETED**
+4. **Implement Admin Dashboard endpoints** - Critical for platform monitoring
+5. **Consider using Zod** for request validation to improve code quality
+6. **Add comprehensive error handling** for production readiness
+7. **Implement proper logging** for debugging and monitoring
+8. **Create seeder scripts** to populate test data
+9. **Set up automated testing** before adding more features
 
 ---
 
 **Last Updated**: 2025-11-05
-**Next Review**: After implementing Calls endpoints
+**Next Review**: After implementing Admin Dashboard endpoints
