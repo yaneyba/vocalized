@@ -7,8 +7,11 @@ const adminRoutes = new Hono<{ Bindings: Env }>();
 import authRoutes from './auth';
 adminRoutes.route('/auth', authRoutes);
 
+// Admin dashboard routes
+import dashboardRoutes from './dashboard';
+adminRoutes.route('/dashboard', dashboardRoutes);
+
 // TODO: Add other admin route modules
-// import dashboardRoutes from './dashboard';
 // import workspaceRoutes from './workspaces';
 // import userRoutes from './users';
 // import providerRoutes from './providers';
@@ -19,8 +22,6 @@ adminRoutes.route('/auth', authRoutes);
 // import billingRoutes from './billing';
 // import configRoutes from './config';
 // import logsRoutes from './logs';
-
-// adminRoutes.route('/dashboard', dashboardRoutes);
 // adminRoutes.route('/workspaces', workspaceRoutes);
 // adminRoutes.route('/users', userRoutes);
 // adminRoutes.route('/providers', providerRoutes);
@@ -38,8 +39,8 @@ adminRoutes.get('/', (c) => {
     message: 'Admin API',
     routes: [
       '/admin/auth/*',
+      '/admin/dashboard/*',
       // Will be added:
-      // '/admin/dashboard/*',
       // '/admin/workspaces/*',
       // '/admin/users/*',
       // '/admin/providers/*',

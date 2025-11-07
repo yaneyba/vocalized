@@ -76,25 +76,40 @@ Set in `wrangler.toml`:
 
 ### Admin API (`/admin`)
 
-- **Authentication**: `/admin/auth/*`
-- **Dashboard**: `/admin/dashboard/*`
-- **Workspaces**: `/admin/workspaces/*`
-- **Users**: `/admin/users/*`
-- **Providers**: `/admin/providers/*`
-- **Templates**: `/admin/templates/*`
-- **Integrations**: `/admin/integrations/*`
-- **Calls**: `/admin/calls/*`
-- **Analytics**: `/admin/analytics/*`
-- **Billing**: `/admin/billing/*`
-- **Configuration**: `/admin/config/*`
-- **Logs**: `/admin/logs/*`
+- **Authentication**: `/admin/auth/*` ✅
+- **Dashboard**: `/admin/dashboard/*` ✅
+  - `GET /admin/dashboard/overview` - Platform metrics
+  - `GET /admin/dashboard/revenue` - Revenue analytics
+  - `GET /admin/dashboard/usage` - Usage statistics
+- **Workspaces**: `/admin/workspaces/*` ⏳
+- **Users**: `/admin/users/*` ⏳
+- **Providers**: `/admin/providers/*` ⏳
+- **Templates**: `/admin/templates/*` ⏳
+- **Integrations**: `/admin/integrations/*` ⏳
+- **Calls**: `/admin/calls/*` ⏳
+- **Analytics**: `/admin/analytics/*` ⏳
+- **Billing**: `/admin/billing/*` ⏳
+- **Configuration**: `/admin/config/*` ⏳
+- **Logs**: `/admin/logs/*` ⏳
 
 ### Client API (`/`)
 
-- **Authentication**: `/auth/*`
-- **Workspaces**: `/workspaces/*`
-- **Templates**: `/templates/*`
-- **Webhooks**: `/webhooks/*`
+- **Authentication**: `/auth/*` ✅
+- **Workspaces**: `/workspaces/*` ✅
+  - Full CRUD operations
+  - Member management
+  - Role-based access control
+- **Voice Agents**: `/workspaces/:id/agents/*` ✅
+  - 8 endpoints (list, create, update, delete, activate, pause, test)
+- **Phone Numbers**: `/workspaces/:id/phone-numbers/*` ✅
+  - 5 endpoints (list, search available, provision, update, delete)
+- **Calls**: `/workspaces/:id/calls/*` ✅
+  - 6 endpoints (list, live, details, recording, transcription, outbound)
+- **Templates**: `/templates/*` ⏳
+- **Integrations**: `/workspaces/:id/integrations/*` ⏳
+- **Analytics**: `/workspaces/:id/analytics/*` ⏳
+- **Billing**: `/workspaces/:id/billing/*` ⏳
+- **Webhooks**: `/webhooks/*` ⏳
 
 ## Development
 
