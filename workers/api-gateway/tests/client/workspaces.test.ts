@@ -2,6 +2,14 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import app from '../../src/index';
 import { createMockEnv, seedTestData } from '../helpers/mock-env';
 import type { Env } from '../../src/types/env';
+import type {
+  LoginResponse,
+  WorkspaceResponse,
+  WorkspacesListResponse,
+  MembersListResponse,
+  ErrorResponse,
+  SuccessResponse
+} from '../helpers/test-types';
 
 describe('Workspace Management', () => {
   let env: Env;
@@ -27,7 +35,7 @@ describe('Workspace Management', () => {
       env
     );
 
-    const loginData = await loginRes.json();
+    const loginData = await loginRes.json() as LoginResponse;
     userToken = loginData.token;
   });
 
@@ -51,7 +59,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(201);
-      const data = await res.json();
+      const data = await res.json() as WorkspaceResponse;
       expect(data.workspace).toMatchObject({
         name: 'My New Workspace',
         industry: 'healthcare',
@@ -79,7 +87,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(400);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Validation Error');
     });
 
@@ -116,7 +124,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as WorkspacesListResponse;
       expect(data).toHaveProperty('workspaces');
       expect(Array.isArray(data.workspaces)).toBe(true);
     });
@@ -142,7 +150,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as WorkspaceResponse;
       expect(data).toHaveProperty('workspace');
       expect(data).toHaveProperty('members');
       expect(data).toHaveProperty('subscription');
@@ -178,7 +186,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as SuccessResponse;
       expect(data.message).toContain('updated successfully');
     });
 
@@ -251,7 +259,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as SuccessResponse;
       expect(data.message).toContain('deleted successfully');
     });
 
@@ -280,7 +288,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as MembersListResponse;
       expect(data).toHaveProperty('members');
       expect(Array.isArray(data.members)).toBe(true);
     });
@@ -326,7 +334,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(400);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Validation Error');
     });
 
@@ -406,7 +414,7 @@ describe('Workspace Management', () => {
       );
 
       expect(res.status).toBe(403);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.message).toContain('owner');
     });
   });

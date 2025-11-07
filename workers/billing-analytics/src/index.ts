@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import type { BillingPeriod, WorkspaceBillingSettings, PlatformSetting, CallStats } from './types';
 
 interface Env {
   DB: D1Database;
@@ -40,8 +41,8 @@ app.post('/usage/record', async (c) => {
     // Get markup percentage from platform settings
     const markupSetting = await c.env.DB.prepare(
       "SELECT value FROM platform_settings WHERE key = 'pricing_markup_percentage'"
-    ).first();
-    const markupPercentage = markupSetting ? parseFloat(markupSetting.value as string) : 20;
+    ).first<PlatformSetting>();
+    const markupPercentage = markupSetting ? parseFloat(markupSetting.value) : 20;
 
     // Calculate costs
     const totalCost = quantity * unit_cost;
@@ -56,7 +57,7 @@ app.post('/usage/record', async (c) => {
     // Get or create billing period
     let billingPeriod = await c.env.DB.prepare(
       'SELECT id FROM billing_periods WHERE workspace_id = ? AND period_start = ?'
-    ).bind(workspace_id, periodStart).first();
+    ).bind(workspace_id, periodStart).first<Pick<BillingPeriod, 'id'>>();
 
     if (!billingPeriod) {
       const billingPeriodId = crypto.randomUUID();
@@ -158,7 +159,7 @@ app.get('/billing/:workspaceId/current', async (c) => {
 
     const billingPeriod = await c.env.DB.prepare(
       'SELECT * FROM billing_periods WHERE workspace_id = ? AND period_start = ?'
-    ).bind(workspaceId, periodStart).first();
+    ).bind(workspaceId, periodStart).first<BillingPeriod>();
 
     if (!billingPeriod) {
       return c.json({
@@ -178,7 +179,7 @@ app.get('/billing/:workspaceId/current', async (c) => {
     // Get billing settings
     const settings = await c.env.DB.prepare(
       'SELECT * FROM workspace_billing_settings WHERE workspace_id = ?'
-    ).bind(workspaceId).first();
+    ).bind(workspaceId).first<WorkspaceBillingSettings>();
 
     const percentageOfLimit = settings && settings.usage_limit_monthly
       ? (billingPeriod.total_amount / settings.usage_limit_monthly) * 100
@@ -239,7 +240,7 @@ app.get('/analytics/:workspaceId/overview', async (c) => {
         SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_calls
       FROM calls
       WHERE workspace_id = ? AND started_at >= ?
-    `).bind(workspaceId, startTime).first();
+    `).bind(workspaceId, startTime).first<CallStats>();
 
     // Get calls by status
     const callsByStatus = await c.env.DB.prepare(`
@@ -257,13 +258,18 @@ app.get('/analytics/:workspaceId/overview', async (c) => {
       GROUP BY agent_id
     `).bind(workspaceId, startTime).all();
 
+    const totalCalls = callStats?.total_calls ?? 0;
+    const totalMinutes = callStats?.total_minutes ?? 0;
+    const avgDuration = callStats?.avg_duration ?? 0;
+    const completedCalls = callStats?.completed_calls ?? 0;
+
     return c.json({
       period,
-      total_calls: callStats?.total_calls || 0,
-      total_minutes: Math.round((callStats?.total_minutes || 0) / 60),
-      avg_call_duration: Math.round(callStats?.avg_duration || 0),
-      success_rate: callStats?.total_calls > 0
-        ? (callStats.completed_calls / callStats.total_calls) * 100
+      total_calls: totalCalls,
+      total_minutes: Math.round(totalMinutes / 60),
+      avg_call_duration: Math.round(avgDuration),
+      success_rate: totalCalls > 0
+        ? (completedCalls / totalCalls) * 100
         : 0,
       calls_by_status: callsByStatus.results,
       calls_by_agent: callsByAgent.results,
@@ -281,7 +287,7 @@ app.get('/analytics/:workspaceId/overview', async (c) => {
 // CRON HANDLERS
 // ============================================
 
-async function handleDailyUsageAggregation(env: Env) {
+async function handleDailyUsageAggregation(_env: Env) {
   console.log('Running daily usage aggregation...');
   // TODO: Aggregate usage data for faster reporting
   // This would create summary records in KV or a separate table
@@ -297,7 +303,7 @@ async function handleMonthlyBillingFinalization(env: Env) {
 
   const periods = await env.DB.prepare(
     "SELECT * FROM billing_periods WHERE status = 'current' AND period_start = ?"
-  ).bind(periodStart.getTime()).all();
+  ).bind(periodStart).all();
 
   for (const period of periods.results) {
     // Finalize billing period
@@ -312,13 +318,13 @@ async function handleMonthlyBillingFinalization(env: Env) {
   console.log(`Finalized ${periods.results.length} billing periods`);
 }
 
-async function handleHourlyAnalyticsUpdate(env: Env) {
+async function handleHourlyAnalyticsUpdate(_env: Env) {
   console.log('Running hourly analytics update...');
   // TODO: Update analytics cache in KV
   // This would aggregate recent data for faster dashboard loading
 }
 
-async function handleDailyAnalyticsAggregation(env: Env) {
+async function handleDailyAnalyticsAggregation(_env: Env) {
   console.log('Running daily analytics aggregation...');
   // TODO: Create daily analytics snapshots
   // This would create summary records for historical data
@@ -330,7 +336,7 @@ export default {
     return app.fetch(request, env);
   },
 
-  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+  async scheduled(event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
     const cron = event.cron;
 
     try {

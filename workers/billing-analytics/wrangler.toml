@@ -21,21 +21,13 @@ ENVIRONMENT = "development"
 # STRIPE_WEBHOOK_SECRET
 
 # Cron triggers for automated tasks
-[[triggers.crons]]
-# Daily usage aggregation at midnight
-schedule = "0 0 * * *"
-
-[[triggers.crons]]
-# Monthly billing finalization on 1st at 1 AM
-schedule = "0 1 1 * *"
-
-[[triggers.crons]]
-# Hourly analytics updates
-schedule = "0 * * * *"
-
-[[triggers.crons]]
-# Daily analytics aggregation at 2 AM
-schedule = "0 2 * * *"
+[triggers]
+crons = [
+  "0 0 * * *",  # Daily usage aggregation at midnight
+  "0 1 1 * *",  # Monthly billing finalization on 1st at 1 AM
+  "0 * * * *",  # Hourly analytics updates
+  "0 2 * * *"   # Daily analytics aggregation at 2 AM
+]
 
 # Development environment
 [env.development]

@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "types": ["@cloudflare/workers-types/2023-07-01", "@types/node", "vitest"],
+    "types": ["@cloudflare/workers-types"],
     "jsx": "react",
     "strict": true,
     "esModuleInterop": true,
@@ -16,11 +16,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", ".wrangler"]
 }

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import app from '../../src/index';
 import { createMockEnv, seedTestData } from '../helpers/mock-env';
 import type { Env } from '../../src/types/env';
+import type { LoginResponse, ErrorResponse, SuccessResponse } from '../helpers/test-types';
 
 describe('Client Authentication', () => {
   let env: Env;
@@ -30,7 +31,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(201);
-      const data = await res.json();
+      const data = await res.json() as LoginResponse;
       expect(data).toHaveProperty('token');
       expect(data).toHaveProperty('refresh_token');
       expect(data.user).toMatchObject({
@@ -57,7 +58,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(400);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Validation Error');
       expect(data.message).toContain('8 characters');
     });
@@ -78,7 +79,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(400);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Validation Error');
     });
   });
@@ -101,7 +102,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as LoginResponse;
       expect(data).toHaveProperty('token');
       expect(data).toHaveProperty('refresh_token');
       expect(data).toHaveProperty('user');
@@ -126,7 +127,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(401);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Authentication Failed');
     });
 
@@ -147,7 +148,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(401);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Authentication Failed');
     });
   });
@@ -170,7 +171,7 @@ describe('Client Authentication', () => {
         env
       );
 
-      const { token } = await loginRes.json();
+      const { token } = await loginRes.json() as LoginResponse;
 
       // Then get user details
       const res = await app.request(
@@ -185,7 +186,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as LoginResponse;
       expect(data).toHaveProperty('user');
       expect(data).toHaveProperty('workspaces');
       expect(data.user.email).toBe('user@test.com');
@@ -217,7 +218,7 @@ describe('Client Authentication', () => {
         env
       );
 
-      const { token } = await loginRes.json();
+      const { token } = await loginRes.json() as LoginResponse;
 
       // Then logout
       const res = await app.request(
@@ -232,7 +233,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as SuccessResponse;
       expect(data.message).toBe('Logged out successfully');
     });
   });
@@ -254,7 +255,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as SuccessResponse;
       expect(data.message).toContain('password reset link');
     });
 
@@ -274,7 +275,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as SuccessResponse;
       expect(data.message).toContain('password reset link');
     });
 
@@ -313,7 +314,7 @@ describe('Client Authentication', () => {
       );
 
       expect(res.status).toBe(400);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.message).toContain('8 characters');
     });
 
