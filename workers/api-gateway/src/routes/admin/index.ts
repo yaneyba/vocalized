@@ -11,10 +11,16 @@ adminRoutes.route('/auth', authRoutes);
 import dashboardRoutes from './dashboard';
 adminRoutes.route('/dashboard', dashboardRoutes);
 
+// Admin workspaces routes
+import workspacesRoutes from './workspaces';
+adminRoutes.route('/workspaces', workspacesRoutes);
+
+// Admin providers routes
+import providersRoutes from './providers';
+adminRoutes.route('/providers', providersRoutes);
+
 // TODO: Add other admin route modules
-// import workspaceRoutes from './workspaces';
 // import userRoutes from './users';
-// import providerRoutes from './providers';
 // import templateRoutes from './templates';
 // import integrationRoutes from './integrations';
 // import callRoutes from './calls';
@@ -40,10 +46,10 @@ adminRoutes.get('/', (c) => {
     routes: [
       '/admin/auth/*',
       '/admin/dashboard/*',
+      '/admin/workspaces/*',
+      '/admin/providers/*',
       // Will be added:
-      // '/admin/workspaces/*',
       // '/admin/users/*',
-      // '/admin/providers/*',
       // '/admin/templates/*',
       // '/admin/integrations/*',
       // '/admin/calls/*',
