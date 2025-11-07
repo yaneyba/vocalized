@@ -13,8 +13,8 @@ Cloudflare Workers API for the Vocalized Voice AI Platform.
 
 ```
 src/
-├── index.ts              # Main application entry point
-├── routes/               # API route handlers
+├── index.ts             # Main application entry point
+├── routes/              # API route handlers
 │   ├── admin/           # Admin API routes
 │   └── client/          # Client API routes
 ├── middleware/          # Middleware (auth, errors, etc.)
@@ -30,11 +30,18 @@ schema/
 
 1. **Install dependencies:**
    ```bash
-   cd workspace/vocalized-api
+   cd workers/api-gateway
    npm install
    ```
 
 2. **Create D1 database:**
+   ```bash
+   # From project root
+   cd database
+   ./setup.sh
+   ```
+
+   Or manually:
    ```bash
    npm run db:create
    ```
@@ -77,13 +84,26 @@ Set in `wrangler.toml`:
 ### Admin API (`/admin`)
 
 - **Authentication**: `/admin/auth/*` ✅
+  - `POST /admin/auth/login` - Admin login
+  - `POST /admin/auth/logout` - Admin logout
+  - `GET /admin/auth/me` - Get current admin
+  - `POST /admin/auth/refresh` - Refresh token
 - **Dashboard**: `/admin/dashboard/*` ✅
   - `GET /admin/dashboard/overview` - Platform metrics
   - `GET /admin/dashboard/revenue` - Revenue analytics
   - `GET /admin/dashboard/usage` - Usage statistics
-- **Workspaces**: `/admin/workspaces/*` ⏳
+- **Workspaces**: `/admin/workspaces/*` ✅
+  - `GET /admin/workspaces` - List all workspaces
+  - `GET /admin/workspaces/:id` - Get workspace details
+  - `PUT /admin/workspaces/:id` - Update workspace
+  - `POST /admin/workspaces/:id/suspend` - Suspend workspace
+  - `POST /admin/workspaces/:id/activate` - Activate workspace
+- **Providers**: `/admin/providers/*` ✅
+  - `GET /admin/providers` - List providers with health & stats
+  - `POST /admin/providers` - Add new provider
+  - `PUT /admin/providers/:provider` - Update provider config
+  - `GET /admin/providers/health` - Platform-wide health status
 - **Users**: `/admin/users/*` ⏳
-- **Providers**: `/admin/providers/*` ⏳
 - **Templates**: `/admin/templates/*` ⏳
 - **Integrations**: `/admin/integrations/*` ⏳
 - **Calls**: `/admin/calls/*` ⏳

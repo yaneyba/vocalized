@@ -14,7 +14,7 @@ Complete setup instructions for the Vocalized Voice AI Platform API.
 ### 1. Install Dependencies
 
 ```bash
-cd workspace/vocalized-api
+cd workers/api-gateway
 npm install
 ```
 
@@ -296,9 +296,15 @@ npm run cf-typegen
 After setup is complete:
 
 1. ✅ **Phase 0 & Phase I Complete**: Infrastructure and database are ready
-2. 🔨 **Phase II**: Implement API endpoints (see main README.md)
-3. 🔒 **Phase III**: Add authentication and middleware
-4. 🔌 **Phase IV**: Connect frontend applications
+2. ✅ **Phase II (67% Complete)**: Core API endpoints implemented
+   - ✅ Admin: Authentication, Dashboard, Workspaces, Providers
+   - ✅ Client: Authentication, Workspaces, Agents, Phone Numbers, Calls
+   - ⏳ Remaining: Templates, Advanced Analytics, Integration endpoints
+3. 🔨 **Phase III (25% Complete)**: Additional workers needed
+   - ⏳ Voice AI Gateway Worker
+   - ⏳ Call Management Engine Worker
+   - ⏳ Integration Hub Worker
+4. ⏳ **Phase IV**: Connect frontend applications
 
 ## Useful Commands Reference
 
@@ -338,5 +344,6 @@ Before deploying to production:
 For issues or questions:
 
 - Check [README.md](./README.md) for API documentation
-- Review [PLANS.md](../vocalized/docs/PLANS.md) for architecture details
+- Review [IMPLEMENTATION_PROGRESS.md](../../docs/IMPLEMENTATION_PROGRESS.md) for detailed progress
+- Review architecture plans in [docs/plans/](../../docs/plans/)
 - Check Cloudflare Workers documentation: https://developers.cloudflare.com/workers/
