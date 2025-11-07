@@ -2,102 +2,98 @@
 
 _Last updated: 2025-11-07_
 
-> This document summarizes how the current Vocalized monorepo is organized, the major runtime components in play, and the architectural intentions that are already encoded in the codebase.
+> This doc walks through the Vocalized monorepo so you can skim once and understand what runs where, how the layers connect, and which parts are still on deck.
 
 ## 1. High-Level Platform View
 
-- **Runtime substrate:** Cloudflare Workers + D1 (SQLite) + KV. Workers are authored in TypeScript using the Hono micro-framework for routing (`workers/api-gateway/src/index.ts`, `workers/billing-analytics/src/index.ts`).
-- **Frontends:** Two React + Vite applications (client & admin portals) live under `frontend/`. They consume the Workers APIs and share a Tailwind-based design system.
-- **Data layer:** `database/` holds the D1 schema, migrations, and a helper script for provisioning databases. Each Worker connects to D1 via Wrangler bindings defined in `wrangler.toml`.
-- **Automation:** Shell scripts in `scripts/` wrap multi-worker deployment and secret management. Documentation in `docs/` tracks plans, testing, onboarding, and progress.
+- **Runtime layer.** Cloudflare Workers host backend logic. Each worker is written in TypeScript with Hono for routing (`workers/api-gateway/src/index.ts`, `workers/billing-analytics/src/index.ts`). D1 (SQLite) stores relational data and KV keeps short-lived session data.
+- **Frontend layer.** Two React + Vite apps live under `frontend/`. They share Tailwind styling and talk to the Workers APIs over HTTPS.
+- **Data layer.** `database/` contains the schema, migrations, and `setup.sh`, which wraps Wrangler commands for provisioning D1 in any environment.
+- **Automation layer.** Shell scripts in `scripts/` handle multi-worker deployments and secret management. The `docs/` directory records onboarding steps, plans, and testing notes.
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│ React Portals (frontend/client-portal, admin-portal) │
+│ React portals (frontend/client-portal, admin-portal) │
 └──────────────▲───────────────────────▲───────────────┘
-               │ API (HTTPS)           │
-        ┌──────┴──────────┐     ┌──────┴───────────────┐
-        │ API Gateway      │     │ Billing & Analytics  │
+               │  HTTPS calls          │
+        ┌──────┴──────────┐      ┌─────┴───────────────┐
+        │ API Gateway      │     │ Billing & Analytics │
         │ (Cloudflare      │◀──┐ │ Worker              │
         │ Workers + Hono)  │   │ │  (usage, billing)   │
-        └──────┬───────────┘   │ └────────┬────────────┘
-               │ binds          │         │
-      ┌────────┴───────┐   ┌────┴─────┐   │
-      │ D1 (SQL schema) │   │ KV (sessions│ │
-      │ /database       │   │ + caches)   │ │
-      └─────────────────┘   └────────────┘ │
-                                (future Stripe, webhooks…)
+        └──────┬───────────┘   │ └────────────┬────────┘
+               │ bindings       │             │
+      ┌────────┴────────┐   ┌──┴──────────┐   │
+      │ D1 (SQL schema) │   │ KV (sessions│   │
+      │ /database       │   │ + caches)   │   │
+      └─────────────────┘   └─────────────┘   │
+                          (future Stripe, webhooks…)
 ```
 
-## 2. Repository Layout & Responsibilities
+## 2. Repository Layout at a Glance
 
-| Path | Purpose | Notes |
-|------|---------|-------|
-| `workers/api-gateway/` | Main public API (admin + client) | Hono app, JWT auth, routes for auth, workspaces, agents, calls, numbers. Tests in `tests/` use Vitest + mocked D1/KV (`tests/helpers/mock-env.ts`). |
-| `workers/billing-analytics/` | Usage tracking & billing microservice | Provides `/usage/*` and `/billing/*` endpoints, calculates markups, updates `billing_periods` + `usage_records`. |
-| `frontend/client-portal/` | Customer-facing dashboard | Vite + React Router, context-driven auth (`providers/AuthContext.tsx`), layout in `components/layout`. |
-| `frontend/admin-portal/` | Platform admin console | Mirrors client structure; not all routes implemented yet. |
-| `database/` | Schema + migrations | `setup.sh` wraps Wrangler commands for provisioning D1, `schema.sql` is the canonical reference generated from migrations. |
-| `scripts/` | Deployment helpers | `deploy-all.sh`, `deploy-worker.sh`, `setup-secrets.sh`. |
-| `docs/` | Knowledge base | Implementation progress, testing strategy, onboarding steps, feature plans. |
+- `workers/api-gateway/` – Main public API for admin and client personas. Uses Hono with JWT auth and is covered by Vitest suites that plug into mocked D1/KV bindings (`tests/helpers/mock-env.ts`).
+- `workers/billing-analytics/` – Companion worker that records usage events, calculates markups, and exposes `/usage/*` plus `/billing/*`.
+- `frontend/client-portal/` – Customer dashboard powered by React Router and a context-based auth layer (`providers/AuthContext.tsx`). Layout primitives live under `components/layout`.
+- `frontend/admin-portal/` – Admin console that mirrors the client app structure but focuses on platform metrics, provider health, and workspace controls.
+- `database/` – Migration files, consolidated schema, and the provisioning script.
+- `scripts/` – `deploy-all.sh`, `deploy-worker.sh`, and `setup-secrets.sh` for repeatable operations.
+- `docs/` – Living documentation (progress tracker, testing guide, onboarding notes, feature plans).
 
-## 3. API Gateway Architecture (`workers/api-gateway`)
+## 3. API Gateway (`workers/api-gateway`)
 
-- **Entry point:** `src/index.ts` builds a Hono app parameterized with `Env` bindings (`DB`, `SESSIONS`, JWT secrets, environment flags). Global middleware adds logging, CORS, and structured error handling.
-- **Routing:** `src/routes/` is segmented by audience:
-  - `routes/admin` → `auth`, `dashboard`, `workspaces`, `providers` modules, each composing the `adminRoutes` router. Placeholder TODO comments outline upcoming modules (users, templates, integrations, etc.).
-  - `routes/client` → `auth`, `workspaces`, `agents`, `phone-numbers`, `calls`.
-  - Every module follows the same pattern: validate input, call helper utilities, interact with D1 via prepared statements, return JSON responses with status codes aligned to the Vitest coverage.
-- **Middleware & Utils:** Shared logic (auth validation, JWT parsing, response helpers) lives under `src/middleware` and `src/utils`.
-- **Testing:** `tests/` mirror the route taxonomy. Workers-specific mocks (`tests/helpers/mock-env.ts`) implement in-memory D1 tables + KV semantics so Vitest can exercise entire request flows (`tests/admin/auth.test.ts`, `tests/client/auth.test.ts`). Response payloads are typed via `tests/helpers/test-types.ts`.
-- **Path aliases:** `tsconfig.json` maps `@/*` → `./src/*`, so everything in routes/tests imports via `@/…` for clarity.
+### Core building blocks
 
-### Data Access Pattern
+- `src/index.ts` instantiates the Hono app with strongly typed `Env` bindings, adds logging/CORS middleware, and mounts the admin + client routers.
+- `src/routes/admin` holds modules for auth, dashboards, workspaces, and providers. TODO markers in `index.ts` highlight future areas (users, templates, integrations, analytics, billing, etc.).
+- `src/routes/client` contains auth, workspace, agent, phone number, and call modules that mirror the admin style but serve workspace users.
+- Shared middleware (auth checks, error helpers) sit in `src/middleware`, while reactive helpers, JWT utilities, and SQL snippets live in `src/utils`.
+- Path aliases in `tsconfig.json` map `@/*` to `./src/*`, keeping imports tidy across both source and test files.
 
-1. Route handler receives a request, optionally gated by auth middleware.
-2. Handler reads/writes from D1 tables using parameterized SQL defined inline or via helper modules.
-3. Responses are shaped into DTO-style objects (admins, workspaces, agents, calls) for both admin and client flows.
-4. Some operations (e.g., admin auth) also touch KV (`SESSIONS`) for session invalidation.
+### Request flow
+
+1. A request enters through global middleware (logger, CORS, error handler) and then optional route-level guards.
+2. The handler validates input, runs prepared statements against D1, and touches KV when session data is involved.
+3. The response is shaped into predictable DTOs so both client and admin UIs can consume them with minimal mapping.
+4. Vitest spins up the Hono app with a mocked `Env`, giving full request/response coverage without Wrangler.
 
 ## 4. Billing & Analytics Worker (`workers/billing-analytics`)
 
-- Focused service that records per-workspace usage, calculates markups based on `platform_settings`, and summarizes current billing periods.
-- Uses the same Hono patterns as the API gateway but exposes specialized endpoints:
-  - `/usage/record` validates payloads, ensures a billing period row exists, and updates usage aggregates.
-  - `/usage/:workspaceId/current` and `/billing/:workspaceId/current` read aggregated stats for dashboards or alerts.
-- Keeps calculations close to the data layer (D1) and is ready to be called asynchronously from other workers (e.g., once call logs are emitted by the voice gateway/call management workers that are still TODO).
+- Uses the same Hono patterns but focuses solely on cost tracking.
+- `/usage/record` validates payloads, ensures a billing period row exists, records usage entries, and updates period totals.
+- `/usage/:workspaceId/current` and `/billing/:workspaceId/current` aggregate spend for dashboards and alerting.
+- Keeping billing logic near the data layer makes it easy for future workers (voice gateway, call management, integration hub) to push usage events without reimplementing accounting rules.
 
 ## 5. Frontend Applications (`frontend/`)
 
-### Client Portal (`client-portal`)
+### Client portal
 
-- Vite + React 19, React Router for nested routes (`src/App.tsx`) with a `ProtectedLayout` that consults `useAuth` before rendering dashboards.
-- Layout components under `components/layout` orchestrate navigation, menu state, and theming. Page folders (`pages/dashboard`, `pages/agents`, etc.) are thin feature modules that eventually call the API gateway.
-- Shared utilities (`lib/`) hold API clients and formatting helpers; `providers/` defines contexts (Auth, UI state). Styling leverages Tailwind (`index.css`) and design tokens defined in CSS variables.
+- `src/App.tsx` defines route nesting. `ProtectedLayout` checks `useAuth` and either renders the dashboard or redirects to `/auth`.
+- `components/layout` orchestrates navigation, header, and shell UI, while folders under `pages/` encapsulate feature-specific screens.
+- Context providers in `providers/` own auth state and shared UI state. Tailwind classes and CSS variables handle styling (`index.css`).
 
-### Admin Portal (`admin-portal`)
+### Admin portal
 
-- Mirrors the client portal structure but targets platform administrators. Provides analytics-heavy views, provider management, and workspace oversight. (See `frontend/admin-portal/src/` for parity components.)
+- Shares the same architecture so teams can reuse layout and state patterns. Key emphasis is on analytics, provider management, and workspace controls. Several views still use mock data until the remaining admin endpoints are built.
 
 ## 6. Database Layer (`database/`)
 
-- `migrations/` contain 9 incremental files spanning 22 tables that cover admins, client users, workspaces, agents, phone numbers, calls, billing, and platform settings.
-- `schema.sql` is the authoritative snapshot of the schema; use it for debugging or introspection outside the migration process.
-- `setup.sh` automates `wrangler d1` commands (creation, migrations, binding updates) so environments can be spun up consistently.
-- Application code accesses the database exclusively through prepared statements (no ORM), keeping logic predictable within the Workers execution constraints.
+- Nine migrations define 22 tables across admins, client users, workspaces, phone numbers, agents, usage, billing, and platform settings.
+- `schema.sql` is the canonical snapshot for reference or visualization.
+- `setup.sh` wraps Wrangler commands to create the D1 database and apply migrations locally or remotely.
+- Application code relies on prepared statements rather than an ORM, keeping queries explicit and Workers-friendly.
 
 ## 7. Tooling, Testing, and Deployment
 
-- **Testing:** API gateway uses Vitest (`npm run test`) with coverage via `@vitest/coverage-v8`. Tests operate directly on the Hono app with mocked bindings, enabling request/response level assertions without spinning up Wrangler.
-- **Type Safety:** Both Workers projects share strict TS configs (ES2022 targets, bundler resolution). Frontend apps compile via Vite with type-checking enforced in the build step (`tsc --noEmit`).
-- **Deployment:** Wrangler scripts (`npm run deploy`, `deploy:staging`, `deploy:production`) ship workers. Shell wrappers in `scripts/` orchestrate multi-worker deployments and secrets. Frontend apps follow standard Vite deploy flows (build → upload to hosting/CDN).
-- **Docs:** `docs/IMPLEMENTATION_PROGRESS.md` tracks feature completeness, `docs/TESTING.md` explains QA strategy, `docs/KNOWN_ISSUES.md` captures outstanding bugs, and `docs/plans/` holds deeper specs for future workers.
+- **Testing.** `npm run test` (Vitest) drives request-level tests with mock bindings. `npm run test:coverage` enables `@vitest/coverage-v8`.
+- **Type safety.** Workers compile against ES2022 with strict TypeScript settings. Frontends run `tsc --noEmit` during build to catch type issues early.
+- **Deployment.** Wrangler handles worker deploys (`deploy`, `deploy:staging`, `deploy:production`). Scripts in `scripts/` orchestrate multi-worker deploys and secret rotation. Frontend apps use the standard Vite flow (`dev`, `build`, `preview`) and can ship via any static host or Cloudflare Pages.
+- **Documentation.** Key references include `docs/IMPLEMENTATION_PROGRESS.md`, `docs/TESTING.md`, `docs/KNOWN_ISSUES.md`, and the design/feature plans under `docs/plans/`.
 
 ## 8. Current Gaps & Next Steps
 
-1. **Unimplemented workers:** Voice gateway, call management, and integration hub are outlined in the root `README.md` but not yet scaffolded.
-2. **Admin/frontend integration:** React portals currently mock data in several pages; wiring them to the API gateway and billing worker is pending.
-3. **Extended route coverage:** Admin modules for users, templates, billing, analytics, etc., still have TODO placeholders in `src/routes/admin/index.ts`.
-4. **Observability:** Logging is limited to console output; consider adding structured logging/analytics (e.g., Workers Trace Events) once workloads increase.
+1. **Unbuilt workers.** Voice gateway, call management, and integration hub appear on the roadmap but are not yet scaffolded.
+2. **Frontend wiring.** Several React screens still rely on mock data; they need to be connected to the API gateway and billing worker.
+3. **Admin coverage.** Admin routes for users, templates, analytics, billing, and logs remain TODO items.
+4. **Observability.** Logging goes to `console.log` today. Instrumentation via structured logs or Workers Trace Events will matter as traffic grows.
 
-Use this document as a quick orientation guide. For deeper implementation notes, jump into the specific `README.md` files inside each worker and the planning docs under `docs/plans/`.
+Use this doc as the fast orientation. Dive into each worker’s `README.md` and the specs in `docs/plans/` for deeper details.
