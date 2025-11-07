@@ -64,3 +64,27 @@ export interface ErrorResponse {
 export interface SuccessResponse {
   message: string;
 }
+
+export interface AdminAuthResponse {
+  token: string;
+  refresh_token: string;
+  admin: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+}
+
+export interface AdminMeResponse {
+  admin: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+}
+
+export interface AdminLogoutResponse {
+  message: string;
+}

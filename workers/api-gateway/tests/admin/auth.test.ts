@@ -2,6 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import app from '@/index';
 import { createMockEnv, seedTestData } from '../helpers/mock-env';
 import type { Env } from '@/types/env';
+import type {
+  AdminAuthResponse,
+  AdminLogoutResponse,
+  AdminMeResponse,
+  ErrorResponse,
+} from '../helpers/test-types';
 
 describe('Admin Authentication', () => {
   let env: Env;
@@ -29,7 +35,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as AdminAuthResponse;
       expect(data).toHaveProperty('token');
       expect(data).toHaveProperty('refresh_token');
       expect(data.admin).toEqual({
@@ -57,7 +63,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(401);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Authentication Failed');
     });
 
@@ -78,7 +84,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(401);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Authentication Failed');
     });
 
@@ -96,7 +102,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(400);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Validation Error');
     });
   });
@@ -119,7 +125,7 @@ describe('Admin Authentication', () => {
         env
       );
 
-      const { token } = await loginRes.json();
+      const { token } = await loginRes.json() as AdminAuthResponse;
 
       // Then get admin details
       const res = await app.request(
@@ -134,7 +140,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as AdminMeResponse;
       expect(data.admin).toHaveProperty('id');
       expect(data.admin).toHaveProperty('email');
       expect(data.admin).toHaveProperty('name');
@@ -145,7 +151,7 @@ describe('Admin Authentication', () => {
       const res = await app.request('/admin/auth/me', { method: 'GET' }, env);
 
       expect(res.status).toBe(401);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Unauthorized');
     });
 
@@ -162,7 +168,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(401);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Unauthorized');
     });
   });
@@ -185,7 +191,7 @@ describe('Admin Authentication', () => {
         env
       );
 
-      const { token } = await loginRes.json();
+      const { token } = await loginRes.json() as AdminAuthResponse;
 
       // Then logout
       const res = await app.request(
@@ -200,7 +206,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as AdminLogoutResponse;
       expect(data.message).toBe('Logged out successfully');
     });
 
@@ -233,7 +239,7 @@ describe('Admin Authentication', () => {
         env
       );
 
-      const { refresh_token } = await loginRes.json();
+      const { refresh_token } = await loginRes.json() as AdminAuthResponse;
 
       // Then refresh
       const res = await app.request(
@@ -251,7 +257,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(200);
-      const data = await res.json();
+      const data = await res.json() as AdminAuthResponse;
       expect(data).toHaveProperty('token');
       expect(data.admin).toHaveProperty('id');
     });
@@ -270,7 +276,7 @@ describe('Admin Authentication', () => {
       );
 
       expect(res.status).toBe(400);
-      const data = await res.json();
+      const data = await res.json() as ErrorResponse;
       expect(data.error).toBe('Validation Error');
     });
   });
