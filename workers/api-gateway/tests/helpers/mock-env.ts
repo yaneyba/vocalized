@@ -1,4 +1,4 @@
-import type { Env } from '../../src/types/env';
+import type { Env } from '@/types/env';
 
 /**
  * Mock D1 Database for testing
@@ -6,10 +6,10 @@ import type { Env } from '../../src/types/env';
 export class MockD1Database implements D1Database {
   private data: Map<string, any[]> = new Map();
 
-  prepare(query: string) {
+  prepare(query: string): D1PreparedStatement {
     const self = this;
     return {
-      bind(...values: any[]) {
+      bind(..._values: any[]) {
         return {
           async first() {
             // Simple mock - return first item from appropriate table
@@ -58,19 +58,30 @@ export class MockD1Database implements D1Database {
       async run() {
         return this.bind().run();
       },
-    };
+    } as D1PreparedStatement;
   }
 
   async dump() {
     return new ArrayBuffer(0);
   }
 
-  async batch(statements: any[]) {
-    return statements.map(() => ({ success: true, meta: {} }));
+  async batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]> {
+    return statements.map(() => ({ success: true, meta: {}, results: [] as T[] })) as D1Result<T>[];
   }
 
-  async exec(query: string) {
+  async exec(_query: string): Promise<D1ExecResult> {
     return { count: 0, duration: 0 };
+  }
+
+  withSession(_constraintOrBookmark?: string): D1DatabaseSession {
+    // Return a mock session that delegates to this database
+    return {
+      exec: this.exec.bind(this),
+      prepare: this.prepare.bind(this),
+      batch: this.batch.bind(this),
+      dump: this.dump.bind(this),
+      getBookmark: () => 'mock-bookmark',
+    } as D1DatabaseSession;
   }
 
   // Helper methods for testing
@@ -86,27 +97,73 @@ export class MockD1Database implements D1Database {
 /**
  * Mock KV Namespace for testing
  */
-export class MockKVNamespace implements KVNamespace {
+export class MockKVNamespace {
   private data: Map<string, string> = new Map();
 
-  async get(key: string): Promise<string | null> {
-    return this.data.get(key) || null;
+  async get(key: string, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>;
+  async get(key: string, type: 'text'): Promise<string | null>;
+  async get<ExpectedValue = unknown>(key: string, type: 'json'): Promise<ExpectedValue | null>;
+  async get(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer | null>;
+  async get(key: string, type: 'stream'): Promise<ReadableStream | null>;
+  async get(key: string, options?: any): Promise<any> {
+    const value = this.data.get(key) || null;
+    if (!value) return null;
+
+    const typeOrOptions = options;
+    if (typeof typeOrOptions === 'string') {
+      if (typeOrOptions === 'json') return JSON.parse(value);
+      if (typeOrOptions === 'arrayBuffer') return new TextEncoder().encode(value).buffer;
+      if (typeOrOptions === 'stream') return new ReadableStream();
+    }
+    return value;
   }
 
-  async put(key: string, value: string): Promise<void> {
-    this.data.set(key, value);
+  async put(key: string, value: string | ArrayBuffer | ArrayBufferView | ReadableStream, _options?: KVNamespacePutOptions): Promise<void> {
+    if (typeof value === 'string') {
+      this.data.set(key, value);
+    } else {
+      this.data.set(key, String(value));
+    }
   }
 
   async delete(key: string): Promise<void> {
     this.data.delete(key);
   }
 
-  async list(): Promise<any> {
-    return { keys: Array.from(this.data.keys()).map(name => ({ name })) };
+  async list(_options?: KVNamespaceListOptions): Promise<KVNamespaceListResult<unknown, string>> {
+    return {
+      keys: Array.from(this.data.keys()).map(name => ({ name })),
+      list_complete: true,
+      cacheStatus: null
+    };
   }
 
-  async getWithMetadata(key: string): Promise<any> {
-    return { value: this.data.get(key) || null, metadata: null };
+  async getWithMetadata<Metadata = unknown>(
+    key: string,
+    options?: Partial<KVNamespaceGetOptions<undefined>>
+  ): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>;
+  async getWithMetadata<Metadata = unknown>(
+    key: string,
+    type: 'text'
+  ): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>;
+  async getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(
+    key: string,
+    type: 'json'
+  ): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
+  async getWithMetadata<Metadata = unknown>(
+    key: string,
+    type: 'arrayBuffer'
+  ): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
+  async getWithMetadata<Metadata = unknown>(
+    key: string,
+    type: 'stream'
+  ): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
+  async getWithMetadata(key: string, _options?: any): Promise<any> {
+    return {
+      value: this.data.get(key) || null,
+      metadata: null,
+      cacheStatus: null
+    };
   }
 
   // Helper for testing
@@ -121,8 +178,10 @@ export class MockKVNamespace implements KVNamespace {
 export function createMockEnv(): Env {
   return {
     DB: new MockD1Database() as any,
-    KV: new MockKVNamespace() as any,
+    SESSIONS: new MockKVNamespace() as any,
     JWT_SECRET: 'test-secret-key-for-testing-only',
+    JWT_EXPIRES_IN: '1h',
+    JWT_REFRESH_EXPIRES_IN: '7d',
     ENVIRONMENT: 'test',
   };
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import app from '../../src/index';
+import app from '@/index';
 import { createMockEnv, seedTestData } from '../helpers/mock-env';
-import type { Env } from '../../src/types/env';
+import type { Env } from '@/types/env';
 import type {
   LoginResponse,
   WorkspaceResponse,
